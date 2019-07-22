@@ -112,7 +112,11 @@ implements Storable, TraitedTileOccupier {
    * @return boolean
    */
   public boolean pickUp(Wearable what) {
-    // TODO please implement me!
+    if (this.currentWeight + what.weight <= this.maxWeight) {
+    	items.add(what);
+    	currentWeight += what.weight;
+    	return true;
+    }
     return false;
   }
 
