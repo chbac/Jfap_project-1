@@ -37,3 +37,4 @@ target/
 
 src/test/resources/game.json
 src/test/resources/sword_out.json
+/bin/
