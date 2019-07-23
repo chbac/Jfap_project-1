@@ -1,12 +1,10 @@
 package de.unisaar.faphack.model;
 
+import de.unisaar.faphack.model.effects.ModifyingEffect;
 import de.unisaar.faphack.model.effects.MultiplicativeEffect;
 import de.unisaar.faphack.model.map.Tile;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author
@@ -197,14 +195,32 @@ implements Storable, TraitedTileOccupier {
      * stamina, quality of different armors, possibly even in the different
      * dimensions.
      */
-	activeEffects.add(eff);
+
+    if(this.armor.size() != 0)  {
+      for(Wearable eachArmor: this.armor)  {
+
+        System.out.println();
+
+        if(eff.health != 0) this.health += eff.health * eachArmor.getCharacterModifier().health;
+        if(eff.magic != 0) this.magic += eff.magic * eachArmor.getCharacterModifier().magic;
+        if(eff.power != 0) this.power += eff.power * eachArmor.getCharacterModifier().power;
+      }
+    }
+    else  {
+      if(eff.health != 0) this.health += eff.health;
+      if(eff.magic != 0) this.magic += eff.magic;
+      if(eff.power != 0) this.power += eff.power;
+    }
   }
 
   /**
    * Apply the effects of, e.g., a poisoning, eating something, etc.
    */
   public void applyItem(CharacterModifier eff) {
-	  activeEffects.add(eff);
+
+    if(eff.health != 0) this.health += eff.health;
+    if(eff.magic != 0)  this.magic += eff.magic;
+    if(eff.power != 0)  this.power += eff.power;
   }
 
   /**

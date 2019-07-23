@@ -32,8 +32,11 @@ public class WallTile extends Tile {
 
   @Override
   public Tile willTake(Character c) {
-    // TODO please implement me!
-    return null;
+
+    if(destructible != 0 && c.getPower() > destructible)
+      return this;
+    else
+      return null;
   }
 
   @Override
