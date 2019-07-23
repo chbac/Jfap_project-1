@@ -136,7 +136,7 @@ implements Storable, TraitedTileOccupier {
     // TODO Auto-generated method stub
   }
 
-  public Item activeWeapon() {
+  public Wearable activeWeapon() {
     return activeWeapon;
   }
 
@@ -212,12 +212,17 @@ implements Storable, TraitedTileOccupier {
    * @param item the item to be removed
    * @return <code>true</code> if the action was successful, <code>false</code> otherwise
    */
+<<<<<<< HEAD
   public boolean dropItem(Wearable w){
 	if (items.contains(w)) {
 		getTile().addItem(w);
 		items.remove(w);
 		return true;
 	}
+=======
+  public boolean dropItem(Wearable item){
+    // TODO please implement me!
+>>>>>>> upstream/master
     return false;
   }
 
