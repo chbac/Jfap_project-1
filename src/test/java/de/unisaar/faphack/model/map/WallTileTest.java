@@ -11,11 +11,15 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class WallTileTest {
 
+  /**
+   * A walltile can only be accessed by a character if it is destructible
+   * and the character has enough power to destroy it
+   *
+   */
   @Test
   void willTake() {
     Character character = createBaseCharacter("Foo", 2, 2);
     Character strongCharacter = createBaseCharacter("Bar", 42, 2);
-
     // indestructible Wall
     WallTile wall = createWallTile(0);
     assertNull(wall.willTake(character));

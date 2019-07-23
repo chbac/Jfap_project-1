@@ -27,6 +27,15 @@ public class FloorTile extends Tile {
     trait = FLOOR;
   }
 
+  /**
+   *
+   * @param c the character that wants to enter this tile
+   * @return  returns <code>this</code> tile if
+   *            1. the class is not already occupied by an character or
+   *            2. is occupied by the character itself
+   *           else null
+   *
+   */
   @Override
   public Tile willTake(Character c) {
     return this;
@@ -38,8 +47,13 @@ public class FloorTile extends Tile {
   }
 
   @Override
-  public boolean pickupItem(Wearable what) {
+  public boolean removeItem(Wearable what) {
     return items.remove(what);
+  }
+
+  @Override
+  public boolean addItem(Wearable what) {
+    return items.add(what);
   }
 
   @Override
@@ -50,6 +64,16 @@ public class FloorTile extends Tile {
   @Override
   public void unmarshal(MarshallingContext c) {
     // TODO please implement me!
+  }
+
+  /**
+   *
+   * @return true if the tile is occupied by a character
+   */
+  @Override
+  public boolean isOccupied(){
+    // TODO please implement me!
+    return false;
   }
 
 }

@@ -1,5 +1,6 @@
 package de.unisaar.faphack.model;
 
+import de.unisaar.faphack.model.effects.MultiplicativeEffect;
 import de.unisaar.faphack.model.map.*;
 import org.junit.jupiter.api.Test;
 
@@ -40,15 +41,29 @@ public class TestUtils {
     return new File(new File(testResourceDir, subdir), name);
   }
 
+
+  /**
+   * Create a default game, the default world ( three rooms, connected by stairs and hallways, two characters and some items)
+   * @return an instance of the default game
+   */
   public static Game createGame(){
     Game game = new Game();
     World world = createWorld();
     // register the world with the game and vice versa
     modifyField(game, false, "world", world);
     modifyField(world, false, "g", game);
+
+    // add protagonist
+    addProtagonist(game, "The guy");
+
     return game;
   }
 
+
+  /**
+   * the default world ( three rooms, connected by stairs and hallways, two characters and some items)
+   * @return an instance of the default world
+   */
   public static World createWorld()  {
     World world = new World();
     List<Room> mapElements = new ArrayList<>();
@@ -95,6 +110,14 @@ public class TestUtils {
     return world;
   }
 
+
+  /**
+   * Creates a simple room of the size x,y ... the room number can be used to identify the room when debugging
+   * @param x the 1 dimension of the room
+   * @param y the 2 dimension of the room
+   * @param roomNo the room number
+   * @return a simple room
+   */
   public static Room createSimpleRoom(int x, int y, int roomNo){
     Room r = new Room();
     Tile[][] tiles = createTiles(x, y, r, roomNo);
@@ -102,6 +125,14 @@ public class TestUtils {
     return r;
   }
 
+  /**
+   * create the tiles used to create a room
+   * @param x the 1 dimension of the room
+   * @param y the 2 dimension of the room
+   * @param room the room the tiles belong to
+   * @param roomNo the room's number
+   * @return a Tile[][] used in the room
+   */
   private static Tile[][] createTiles(int x, int y, Room room, int roomNo){
     Tile[][] result = new Tile[x][y];
     for(int i = 0; i < x; i++){
@@ -121,13 +152,28 @@ public class TestUtils {
   }
 
 
-
+  /**
+   * Add the given Character to the room at the given position
+   * @param room the room the character should be added to
+   * @param x the x position
+   * @param y
+   * @param character
+   */
   public static void addCharacter(Room room, int x, int y, Character character){
     List<Character> inhabitants = new ArrayList<>();
     inhabitants.add(character);
     modifyField(room,false, "inhabitants", inhabitants);
     placeCharacter(character,room.getTiles()[x][y]);
     //modifyField(character, false, "tile", room.getTiles()[x][y]);
+  }
+
+  public static CharacterModifier createCharacterModifier(int health, int magic, int power, int howlong ) {
+    CharacterModifier attack = new CharacterModifier();
+    attack.health = health;
+    attack.magic = magic;
+    attack.power = power;
+    modifyField(attack, false, "howLong", howlong);
+    return attack;
   }
 
   @Test
@@ -183,6 +229,13 @@ public class TestUtils {
     assertEquals(Wearable.class, r3.getTiles()[2][8].onTile().get(0).getClass());
   }
 
+  /**
+   * Place items at the specified position in the room
+   * @param room the room in which the items should appear
+   * @param x the x coordinate
+   * @param y the y coordinate
+   * @param items the items to be added
+   */
   public static void placeItemsInRoom(Room room, int x, int y, Wearable... items) {
     List<Wearable> onTile = new ArrayList<>(Arrays.asList(items));
     for(Wearable wearable : onTile){
@@ -191,10 +244,21 @@ public class TestUtils {
     modifyField(room.getTiles()[x][y], false, "items", onTile);
   }
 
+  /**
+   * Place the character on the given tile.
+   * @param testObject
+   * @param tile
+   */
   public static void placeCharacter(Character testObject, Tile tile) {
     modifyField(testObject, false, "tile", tile);
   }
 
+  /**
+   * Create a simple instance of Wearable
+   * @param weight the weight of the wearable
+   * @param isWeapon boolean determining whether the wearable is a weapon
+   * @return the new wearable
+   */
   public static Wearable createWearable(int weight, boolean isWeapon) {
     Wearable item = new Wearable();
     modifyField(item, false, "weight", weight);
@@ -202,6 +266,12 @@ public class TestUtils {
     return item;
   }
 
+  /**
+   * create a doortile with the given properties
+   * @param destructible 0 if the door is indestructible, else power needed to force door open
+   * @param isLocked true if the door is locked, otherwise false
+   * @return
+   */
   public static DoorTile createDoorTile(int destructible, boolean isLocked) {
     DoorTile doorTile = new DoorTile();
     modifyField(doorTile, false, "locked", isLocked);
@@ -209,23 +279,42 @@ public class TestUtils {
     return doorTile;
   }
 
+  /**
+   * create a walltile with the given properties
+   * @param destructible 0 if the door is indestructible, else power needed to force door open
+   * @return
+   */
   public static WallTile createWallTile(int destructible){
     WallTile wallTile = new WallTile();
     modifyField(wallTile, false, "destructible", destructible);
     return wallTile;
   }
 
+  /**
+   * Create a default character, specified by it name, power, and the max weight he can carry
+   * @param name the name of the character
+   * @param power the character's power
+   * @param maxWeight the max weight the character can carry
+   * @return the default character
+   */
   public static Character createBaseCharacter(String name, int power, int maxWeight ){
     Character character = new Character();
     modifyField(character, false, "name", name);
     modifyField(character,false, "items", new ArrayList<>());
     modifyField(character, false, "maxWeight", maxWeight);
     modifyField(character, false, "power", power);
+    modifyField(character, false, "magic", 50);
     modifyField(character, false, "role", character.WARRIOR);
     return character;
   }
 
 
+  /**
+   * connect two doorTiles with a hallway
+   * @param t1 the "start" doorTile
+   * @param t2 the "end" doorTile
+   * @return a new instance of Hallway
+   */
   public static Hallway connectTiles(DoorTile t1, DoorTile t2) {
     Hallway connector = new Hallway();
     modifyField(connector,true,"fromTile", t1);
@@ -235,6 +324,12 @@ public class TestUtils {
     return connector;
   }
 
+  /**
+   * connect two stairtiles with a stairs
+   * @param t1 the "start" doorTile
+   * @param t2 the "end" doorTile
+   * @return a new instance of stair
+   */
   public static Stair connectTiles(StairTile t1, StairTile t2) {
     Stair connector = new Stair();
     modifyField(connector,true,"fromTile", t1);
@@ -244,4 +339,47 @@ public class TestUtils {
     return connector;
   }
 
+  /**
+   * creates an armor
+   * @param health double defining by how much the armor protects the characters health
+   * @param magic double defining by how much the armor protects the characters magic
+   * @param power double defining by how much the armor protects the characters power
+   * @return
+   */
+  public static Armor createArmor(double health, double magic, double power ){
+    Armor armor = new Armor();
+    MultiplicativeEffect multiplicativeEffect = new MultiplicativeEffect();
+    modifyField(multiplicativeEffect, true, "health", health);
+    modifyField(multiplicativeEffect, true, "magic", magic);
+    modifyField(multiplicativeEffect, true, "power", power);
+    modifyField(armor, false, "modifyingEffect", multiplicativeEffect);
+    return armor;
+  }
+
+  /**
+   * equip the given wearable as the active weapon of the character
+   * @param wearable the weapon
+   * @param character the character that will carry it
+   */
+  public static void equipWeapon(Wearable wearable, Character character){
+    character.activeWeapon = wearable;
+  }
+
+  /**
+   * equip the given armor as the armor of the character
+   * @param armor the armor, and
+   * @param character the character that will carry it
+   */
+  public static void equipArmor(Armor armor, Character character){
+    character.armor.add(armor);
+  }
+
+  /** Add a protagonist with given name to the game */
+  public static Character addProtagonist(Game game, String name){
+    Character character = new Character();
+    modifyField(game, false, "protagonist", character);
+    modifyField(character, false, "name", name);
+    modifyField(character, false, "role", character.WARRIOR);
+    return character;
+  }
 }

@@ -8,6 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RoomTest {
 
+  /**
+   * Given a direction, e.g. next tile on the right (0, 1), check whether the room.getNextTile method returns the
+   * correct tile
+   */
   @Test
   void getNextTile() {
     Room room = TestUtils.createSimpleRoom(4,4, 1);
