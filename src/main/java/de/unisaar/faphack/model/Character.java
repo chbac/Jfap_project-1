@@ -17,6 +17,7 @@ implements Storable, TraitedTileOccupier {
 
   /**
    * I'm currently on this level
+   * 
    */
   private int level = 0;
 

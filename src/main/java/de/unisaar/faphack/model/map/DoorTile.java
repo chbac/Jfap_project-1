@@ -34,6 +34,11 @@ public class DoorTile extends WallTile implements Storable, Observable<DoorTile>
 
   @Override
   public Tile willTake(Character c) {
+	if (locked && this.destructible <= c.getPower()) {
+		return this;
+	} else if (!locked) {
+		return this;
+	}
     return null;
   }
 

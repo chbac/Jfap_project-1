@@ -49,7 +49,7 @@ public abstract class Tile implements Storable, TraitOwner {
    * @return the next tile in direction d
    */
   public Tile getNextTile(Direction d) {
-    // TODO please implement me!
+	room.getNextTile(this, d);
     return null;
   }
 
