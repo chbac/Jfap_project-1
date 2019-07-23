@@ -117,12 +117,11 @@ implements Storable, TraitedTileOccupier {
    */
   public boolean pickUp(Wearable what) {
 	if (getWeight() + what.weight <= maxWeight &&
-			what.getTile() != null &&
-			what.getTile().getX() == getTile().getX() &&
-			what.getTile().getY() == getTile().getY()) {
+			//what.getTile() != null &&
+			what.getTile().equals(getTile())) {
 		currentWeight += what.weight;
 		items.add(what);
-		what.getTile().pickupItem(what);
+		what.getTile().removeItem(what);
 		what.character = this;
 		what.onTile = null;
 		return true;
