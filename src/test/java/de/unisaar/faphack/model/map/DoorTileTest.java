@@ -10,6 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class DoorTileTest {
 
+
+  /**
+   * 1. An character should not be able to enter a DoorTile if it is locked
+   * 2. however the door can be opened by force if the character has enough power.
+   * 3. And, if the door is open the characte can simply use it to get to another room
+   */
   @Test
   void willTake() {
     Character character = createBaseCharacter("Foo", 3,3);

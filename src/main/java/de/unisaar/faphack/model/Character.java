@@ -108,9 +108,12 @@ implements Storable, TraitedTileOccupier {
 
   /**
    * Pick up the given Wearable. Returns true if the action is possible.
+   * The character can only pickup an item if it is
+   * 1. on the same tile
+   * 2. the current weight of all items the character carries + the weight of the item is less then maxWeight
    *
-   * @param what
-   * @return boolean
+   * @param what the item to be picked up
+   * @return  boolean <code>true</code> if the action was successful, <code>false</code> otherwise
    */
   public boolean pickUp(Wearable what) {
 	if (getWeight() + what.weight < maxWeight &&
@@ -202,6 +205,26 @@ implements Storable, TraitedTileOccupier {
    */
   public void applyItem(CharacterModifier eff) {
 	  activeEffects.add(eff);
+  }
+
+  /**
+   * removes the given Item from the characters inventory
+   * @param item the item to be removed
+   * @return <code>true</code> if the action was successful, <code>false</code> otherwise
+   */
+  public boolean dropItem(Item item){
+    // TODO please implement me!
+    return false;
+  }
+
+  /**
+   * Equips the given Wearable as active Weapon or armor depending
+   * @param wearable the item to be equipped
+   * @return <code>true</code> the action was successful, <code>false</code> otherwise
+   */
+  public boolean equipItem(Wearable wearable){
+    // TODO please implement me!
+    return false;
   }
 
   @Override

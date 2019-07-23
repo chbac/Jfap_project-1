@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TileTest {
 
+
   @Test
   void getNextTile() {
     Room r = TestUtils.createSimpleRoom(4,4, 1);

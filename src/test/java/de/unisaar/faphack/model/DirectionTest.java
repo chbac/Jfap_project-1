@@ -7,6 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DirectionTest {
 
+  /**
+   * Checks the Constructor of the Direction class
+   */
   @Test
   public void TestConstructor(){
 
