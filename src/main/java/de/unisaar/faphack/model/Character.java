@@ -112,11 +112,21 @@ implements Storable, TraitedTileOccupier {
    * @return boolean
    */
   public boolean pickUp(Wearable what) {
+<<<<<<< HEAD
     if (this.currentWeight + what.weight <= this.maxWeight) {
     	items.add(what);
     	currentWeight += what.weight;
     	return true;
     }
+=======
+    // TODO please implement me!
+	if (getWeight() + what.weight > maxWeight) {
+		return false;
+	} else {
+		currentWeight += what.weight;
+		items.add(what);
+	}
+>>>>>>> 31771af824251f7e3df87c1de2703cdd6aeb561f
     return false;
   }
 
@@ -164,8 +174,7 @@ implements Storable, TraitedTileOccupier {
   }
 
   public int getWeight() {
-    // TODO: implement
-    return 0;
+    return currentWeight;
   }
 
   public int levelDown() {
@@ -196,6 +205,7 @@ implements Storable, TraitedTileOccupier {
    * Apply the effects of, e.g., a poisoning, eating something, etc.
    */
   public void applyItem(CharacterModifier eff) {
+	  activeEffects.add(eff);
   }
 
   @Override

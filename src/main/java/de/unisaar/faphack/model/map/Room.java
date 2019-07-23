@@ -28,7 +28,14 @@ public class Room implements Storable {
   public Room(){}
 
   public Tile getNextTile(Tile t, Direction d) {
-    // TODO please implement me!
+	int xNew = t.x + d.x;
+	int yNew = t.y + d.y;
+
+	if (tiles.length >= xNew && xNew >= 0) {
+		if (tiles[xNew].length >= yNew && yNew >= 0) {
+			return tiles[xNew][yNew];
+		}
+	}
     return null;
   }
 
