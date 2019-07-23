@@ -212,8 +212,12 @@ implements Storable, TraitedTileOccupier {
    * @param item the item to be removed
    * @return <code>true</code> if the action was successful, <code>false</code> otherwise
    */
-  public boolean dropItem(Item item){
-    // TODO please implement me!
+  public boolean dropItem(Wearable w){
+	if (items.contains(w)) {
+		getTile().addItem(w);
+		items.remove(w);
+		return true;
+	}
     return false;
   }
 
@@ -223,7 +227,11 @@ implements Storable, TraitedTileOccupier {
    * @return <code>true</code> the action was successful, <code>false</code> otherwise
    */
   public boolean equipItem(Wearable wearable){
-    // TODO please implement me!
+    if (items.contains(wearable) && !armor.contains(wearable)) {
+    	items.remove(wearable);
+    	armor.add(wearable);
+    	return true;
+    }
     return false;
   }
 
