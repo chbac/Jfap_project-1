@@ -34,7 +34,6 @@ public class DoorTile extends WallTile implements Storable, Observable<DoorTile>
 
   @Override
   public Tile willTake(Character c) {
-    // TODO please implement me!
     return null;
   }
 

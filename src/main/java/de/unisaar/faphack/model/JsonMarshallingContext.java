@@ -26,11 +26,14 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   public JsonMarshallingContext(File f, StorableFactory fact) {
     file = f;
+    factory = fact;
   }
 
   @Override
   public void save(Storable s) {
     // TODO Auto-generated method stub
+	
+	  
   }
 
   public Storable read() {
@@ -41,7 +44,6 @@ public class JsonMarshallingContext implements MarshallingContext {
   @Override
   public void write(String key, Storable object) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
@@ -65,7 +67,6 @@ public class JsonMarshallingContext implements MarshallingContext {
   @Override
   public void write(String key, double object) {
     // TODO Auto-generated method stub
-
   }
 
   @Override

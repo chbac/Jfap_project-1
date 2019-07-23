@@ -19,8 +19,13 @@ public class MoveEffect implements Effect<Character, Boolean> {
    * @return true if successful, false otherwise
    */
   public Boolean apply(Character c) {
-    // TODO: FILL THIS
-    return false;
+	if (c.getTile().getNextTile(dir) != null && c.getTile().willTake(c) != null) {
+		c.move(c.getTile().getNextTile(dir));
+		return true;
+	}
+	return false;
+	
+    
   }
 
 }

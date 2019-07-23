@@ -60,7 +60,7 @@ public abstract class Tile implements Storable, TraitOwner {
    *         otherwise
    */
   public abstract Tile willTake(Character c);
-
+  
   /**
    *  Almost all tiles can not have items on them.
    */
