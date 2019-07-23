@@ -119,6 +119,8 @@ implements Storable, TraitedTileOccupier {
 			what.getTile().getY() == getTile().getY()) {
 		currentWeight += what.weight;
 		items.add(what);
+		what.character = this;
+		what.onTile = null;
 		return true;
 	}
 	return false;
