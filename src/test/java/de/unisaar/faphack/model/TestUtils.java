@@ -10,8 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TestUtils {
@@ -86,18 +85,19 @@ public class TestUtils {
     // Connect Room 2 and 3 with stairs
     StairTile stairTile1 = (StairTile) room2.getTiles()[7/2][7/2];
     StairTile stairTile2 = (StairTile) room3.getTiles()[4/2][10/2];
-    connectTiles(stairTile1, stairTile2);
+    connectStairTiles(stairTile1, stairTile2,false);
 
     // add two characters to the world
-    Character c1 = createBaseCharacter("Foo", 0, 10);
-    Character c2 = createBaseCharacter("Bar", 0, 10);
+    Character c1 = createBaseCharacter("Foo", 10, 10);
+    Character c2 = createBaseCharacter("Bar", 10, 10);
     addCharacter(room1, 2,2,c1);
     addCharacter(room3, 1,4,c2);
 
     // create a bunch of items and place them in the world
-    Item sword = createWearable(2, true);
+    Wearable sword = createWearable(2, true);
     modifyField(sword, false, "character",  c1);
     modifyField(c1, false, "activeWeapon", sword );
+    c1.items.add(sword);
     Item fountain = new Fixtures();
     List<Item> onTile = new ArrayList<>();
     onTile.add(fountain);
@@ -147,7 +147,7 @@ public class TestUtils {
     // place a door
     if (roomNo < 3) result[0][y/2] = new DoorTile(0, y/2 , room);
     // place a stair tile right in the center of the room
-    if (roomNo > 0) result[x/2][y/2] = new StairTile(x/2, y/2, room);
+    if (roomNo > 1) result[x/2][y/2] = new StairTile(x/2, y/2, room);
     return result;
   }
 
@@ -330,8 +330,9 @@ public class TestUtils {
    * @param t2 the "end" doorTile
    * @return a new instance of stair
    */
-  public static Stair connectTiles(StairTile t1, StairTile t2) {
+  public static Stair connectStairTiles(StairTile t1, StairTile t2, boolean isOneWay) {
     Stair connector = new Stair();
+    modifyField(connector, false, "oneWay", isOneWay);
     modifyField(connector,true,"fromTile", t1);
     modifyField(connector,true,"toTile", t2);
     modifyField(t1, false, "stair", connector);
@@ -372,6 +373,7 @@ public class TestUtils {
    */
   public static void equipArmor(Armor armor, Character character){
     character.armor.add(armor);
+    character.items.add(armor);
   }
 
   /** Add a protagonist with given name to the game */
