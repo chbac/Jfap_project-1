@@ -136,7 +136,7 @@ implements Storable, TraitedTileOccupier {
     // TODO Auto-generated method stub
   }
 
-  public Item activeWeapon() {
+  public Wearable activeWeapon() {
     return activeWeapon;
   }
 
