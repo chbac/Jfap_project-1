@@ -61,7 +61,7 @@ public class JsonMarshallingContext implements MarshallingContext {
   private JSONObject toJson(Storable s) {
 	  JSONObject output = new JSONObject();
 	  // If not in writecache
-	  if (writecache.get(s) != null) {
+	  if (writecache.get(s) == null) {
 		  // s wasn't in cache, add it and assign new ID
 		  String new_id = s.getClass().getSimpleName()+"@"+String.valueOf(idGenerator++);
 		  output.put("id", new_id);
@@ -81,6 +81,10 @@ public class JsonMarshallingContext implements MarshallingContext {
   @SuppressWarnings("unchecked")
   @Override
   public void write(String key, Storable object) {
+	  if (object == null) {
+		  stack.getFirst().put(key, null);
+		  return;
+	  }
 	  if (writecache.containsKey(object)) {
 		  stack.getFirst().put(key, writecache.get(object));
 	  } else {
@@ -135,7 +139,12 @@ public class JsonMarshallingContext implements MarshallingContext {
   @SuppressWarnings("unchecked")
   @Override
   public void write(String key, Collection<? extends Storable> coll) {
-	  stack.getFirst().put(key, coll.toArray());
+	  for (Storable s : coll) {
+		  if (s instanceof Room) {
+			 
+		  }
+	  }
+	  stack.getFirst().put(key, coll);
   }
 
   @Override
