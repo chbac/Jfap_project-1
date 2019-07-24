@@ -219,8 +219,8 @@ implements Storable, TraitedTileOccupier {
    */
   public boolean dropItem(Wearable w){
 	if (items.contains(w)) {
-		getTile().addItem(w);
 		items.remove(w);
+		getTile().addItem(w);
 		return true;
 	}
     return false;
@@ -231,10 +231,10 @@ implements Storable, TraitedTileOccupier {
    * @param wearable the item to be equipped
    * @return <code>true</code> the action was successful, <code>false</code> otherwise
    */
-  public boolean equipItem(Wearable wearable){
-    if (items.contains(wearable) && !armor.contains(wearable)) {
-    	items.remove(wearable);
-    	armor.add(wearable);
+  public boolean equipItem(Armor a){
+    if (items.contains(a) && !armor.contains(a)) {
+    	items.remove(a);
+    	armor.add(a);
     	return true;
     }
     return false;
@@ -245,7 +245,19 @@ implements Storable, TraitedTileOccupier {
 
   @Override
   public void marshal(MarshallingContext c) {
-    // TODO please implement me!
+    c.write("level", level);
+    c.write("health", health);
+    c.write("magic", magic);
+    c.write("power", power);
+    c.write("items", items);
+    c.write("skills", skills);
+    c.write("armor", armor);
+    c.write("maxWeight", maxWeight);
+    c.write("currentWeight", currentWeight);
+    c.write("activeEffects", activeEffects);
+    c.write("role", role);
+    c.write("name", name);
+    c.write("activeWeapon", activeWeapon);
   }
 
   @Override

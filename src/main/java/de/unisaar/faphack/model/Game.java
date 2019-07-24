@@ -2,6 +2,7 @@ package de.unisaar.faphack.model;
 
 import de.unisaar.faphack.model.effects.MoveEffect;
 import de.unisaar.faphack.model.map.Tile;
+import de.unisaar.faphack.model.map.WallTile;
 import de.unisaar.faphack.model.map.World;
 
 import java.util.List;
@@ -34,8 +35,12 @@ public class Game implements Storable {
    * @return boolean
    */
   public boolean move(Character whom, Direction direction) {
-    // TODO please implement me!
-    return false;
+	if (whom.getTile().getNextTile(direction) != null
+		&& !(whom.getTile().getNextTile(direction) instanceof WallTile)) {
+			whom.move(whom.getTile().getNextTile(direction));
+			return true;
+		}
+	return false;
   }
 
   /**
@@ -85,13 +90,14 @@ public class Game implements Storable {
    * @param what the item to be equipped
    * @return <code>true</code> the action was successful, <code>false</code> otherwise
    */
-  public boolean equip(Character who, Wearable what){
+  public boolean equip(Character who, Armor what){
 	return who.equipItem(what);
   }
 
   @Override
   public void marshal(MarshallingContext c) {
-    // TODO please implement me!
+    c.write("world", world);
+    c.write("protagonist", protagonist);
   }
 
   @Override

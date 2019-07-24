@@ -29,7 +29,9 @@ implements Storable, TraitedTileOccupier {
   }
 
   public void marshal(MarshallingContext c) {
-    // TODO please implement me!
+    c.write("tile", onTile);
+    c.write("trait", trait);
+    c.write("characterModifier", effect);
   }
 
   public void unmarshal(MarshallingContext c) {
