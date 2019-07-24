@@ -28,6 +28,9 @@ public class JsonMarshallingContext implements MarshallingContext {
   public JsonMarshallingContext(File f, StorableFactory fact) {
     file = f;
     factory = fact;
+    writecache = new IdentityHashMap<Storable, String>();
+    readcache = new HashMap<String, Storable>();
+    stack = new ArrayDeque<JSONObject>();
   }
 
   @Override
@@ -78,7 +81,12 @@ public class JsonMarshallingContext implements MarshallingContext {
   @SuppressWarnings("unchecked")
   @Override
   public void write(String key, Storable object) {
-	  stack.getFirst().put(key, toJson(object));
+	  if (writecache.containsKey(object)) {
+		  stack.getFirst().put(key, writecache.get(object));
+	  } else {
+		  stack.getFirst().put(key, toJson(object));
+	  }
+
   }
 
   @Override
