@@ -32,6 +32,16 @@ public class TestUtils {
     }
   }
 
+  private static void modifySuperSuperField(Object modifiedObject, String fieldname, Object value){
+    try {
+      Field f = modifiedObject.getClass().getSuperclass().getSuperclass().getDeclaredField(fieldname);
+      f.setAccessible(true);
+      f.set(modifiedObject, value);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
   public static String getTestResource(String subdir, String name) {
     return getTestResourceFile(subdir, name).getPath();
   }
@@ -231,15 +241,18 @@ public class TestUtils {
 
   /**
    * Place items at the specified position in the room
-   * @param room the room in which the items should appear
    * @param x the x coordinate
+   * @param room the room in which the items should appear
    * @param y the y coordinate
    * @param items the items to be added
    */
-  public static void placeItemsInRoom(Room room, int x, int y, Wearable... items) {
-    List<Wearable> onTile = new ArrayList<>(Arrays.asList(items));
-    for(Wearable wearable : onTile){
-      modifyField(wearable, true, "onTile", room.getTiles()[x][y]);
+  public static void placeItemsInRoom(Room room, int x, int y, Item... items) {
+    List<Item> onTile = new ArrayList<>(Arrays.asList(items));
+    for(Item wearable : onTile){
+      if (wearable instanceof  Armor)
+        modifySuperSuperField(wearable, "onTile", room.getTiles()[x][y]);
+      else
+        modifyField(wearable, true, "onTile", room.getTiles()[x][y]);
     }
     modifyField(room.getTiles()[x][y], false, "items", onTile);
   }

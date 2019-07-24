@@ -15,6 +15,7 @@ public abstract class AbstractObservable<T> implements Observable<T> {
   };
 
   public void notifyObservers(T object) {
-    for(Observer<T> o: observers) { o.update(object); }
+    if (observers != null)
+      for(Observer<T> o: observers) { o.update(object); }
   }
 }

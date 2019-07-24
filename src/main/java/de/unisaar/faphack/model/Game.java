@@ -28,8 +28,6 @@ public class Game implements Storable {
 
   /**
    * tries to move the character into the given direction.
-   * If the character's power == 0 only moves with direction (0,0) are possible, i.e. the character is resting
-   * and its power increases by 5
    * @param whom
    * @param direction
    * @return boolean
