@@ -1,5 +1,6 @@
 package de.unisaar.faphack.model;
 
+import de.unisaar.faphack.model.map.FloorTile;
 import de.unisaar.faphack.model.map.Room;
 import de.unisaar.faphack.model.map.Tile;
 import org.junit.jupiter.api.Test;
@@ -52,6 +53,8 @@ class CharacterTest {
     assertTrue(testObject.items.contains(item1));
     // the item is too heavy for the character
     assertFalse(testObject.pickUp(item2));
+    assertEquals(testObject, item1.character);
+    assertNull(item1.onTile);
   }
 
 
@@ -118,5 +121,63 @@ class CharacterTest {
     assertEquals(100, testObject.health);
     assertEquals( 50, testObject.magic);
     assertEquals(42, testObject.power);
+  }
+
+  /**
+   * Resting will increase a character's power by 5.
+   */
+  @Test
+  void rest() {
+    Character foo = createBaseCharacter("Foo", 2, 2);
+    foo.rest();
+    assertEquals(7, foo.getPower());
+  }
+
+  @Test
+  void dropItem() {
+    Character character = createBaseCharacter("Foo", 10, 10);
+    placeCharacter(character, new FloorTile());
+    Wearable sword = createWearable(2, true);
+    character.items.add(sword);
+    character.activeWeapon = sword;
+    Armor armor = createArmor(1,1,1);
+    equipArmor(armor, character);
+    assertTrue(character.dropItem(sword));
+    // the inventory should be empty now
+    assertTrue(!character.items.contains(sword));
+    // the active weapon of the character should be null
+    assertNull(character.getActiveWeapon());
+    // the dropped wearable should be placed on the tile of the character
+    assertTrue(character.tile.onTile().contains(sword));
+    // now remove the armor from the inventory
+    assertTrue(character.dropItem(armor));
+    assertTrue(!character.items.contains(armor));
+    assertTrue(!character.armor.contains(armor));
+    assertTrue(character.tile.onTile().contains(armor));
+    // try to remove an item which is not part of the inventory : returns false
+    Wearable w = createWearable(1,false);
+    assertFalse(character.dropItem(w));
+  }
+
+  @Test
+  void equipItem() {
+    // this character has only one wearable in its inventory, which is also the character's active weapon
+    Character character = createBaseCharacter("Foo", 10, 10);
+    Wearable sword = createWearable(2, true);
+    character.items.add(sword);
+
+    Armor armor = createArmor(1,1,1);
+    character.items.add(armor);;
+    // Equip an armor
+    assertTrue(character.equipItem(armor));
+    assertTrue(character.armor.contains(armor));
+
+    // Equip a weapon
+    assertTrue(character.equipItem(sword));
+    assertTrue(character.activeWeapon == sword);
+
+    // Illegal equip ( item not in inventory)
+    Wearable item = createWearable(1, true);
+    assertFalse(character.equipItem(item));
   }
 }

@@ -16,7 +16,7 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   private static StorableFactory factory;
 
-  private IdentityHashMap<Object, String> writecache;
+  private IdentityHashMap<Storable, String> writecache;
 
   private Deque<JSONObject> stack;
 
