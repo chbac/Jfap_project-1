@@ -231,11 +231,16 @@ implements Storable, TraitedTileOccupier {
    * @param wearable the item to be equipped
    * @return <code>true</code> the action was successful, <code>false</code> otherwise
    */
-  public boolean equipItem(Armor a){
-    if (items.contains(a) && !armor.contains(a)) {
-    	items.remove(a);
-    	armor.add(a);
-    	return true;
+  public boolean equipItem(Wearable w){
+    if (items.contains(w) && !armor.contains(w)) {
+    	items.remove(w);
+    	if(w.isWeapon) {
+    		activeWeapon = w;
+    		return true;
+    	} else if(w instanceof Armor) {
+    		armor.add((Armor)w);
+    		return true;
+    	}
     }
     return false;
   }
