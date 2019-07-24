@@ -41,7 +41,9 @@ implements Effect<CharacterModifier, CharacterModifier>, Storable {
 
   @Override
   public void marshal(MarshallingContext c) {
-    // TODO: FILL THIS
+    c.write("health", health);
+    c.write("magic", magic);
+    c.write("power", power);
   }
 
   @Override

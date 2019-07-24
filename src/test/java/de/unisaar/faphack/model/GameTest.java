@@ -30,6 +30,8 @@ class GameTest {
     // the item should have been removed from the tile and moved into the inventory of the character
     assertTrue(testObject.items.contains(item1));
     assertTrue(!room.getTiles()[1][2].onTile().contains(item1));
+    assertEquals(testObject, item1.character);
+    assertNull(item1.onTile);
 
   }
 
@@ -77,5 +79,57 @@ class GameTest {
       expected.remove(item);
     }
     assertTrue(expected.isEmpty());
+  }
+
+  /**
+   * Resting will increase the character's power by 5
+   */
+  @Test
+  void rest() {
+    Game game = createGame();
+    Character character = game.getWorld().getMapElements().get(0).getInhabitants().get(0);
+    game.rest(character);
+    assertEquals(7, character.getPower());
+  }
+
+  @Test
+  void drop() {
+    Game game = createGame();
+    // this character has only one wearable in its inventory, which is also the character's active weapon
+    Character character = game.getWorld().getMapElements().get(0).getInhabitants().get(0);
+    Armor armor = createArmor(1,1,1);
+    equipArmor(armor, character);
+    Wearable sword = character.getActiveWeapon();
+    assertTrue(game.drop(character, sword));
+    assertTrue(character.tile.onTile().contains(sword));
+    // now remove the armor from the inventory
+    assertTrue(character.dropItem(armor));
+    // try to remove an item which is not part of the inventory : returns false
+    Wearable w = createWearable(1,false);
+    assertFalse(game.drop(character, w));
+  }
+
+  @Test
+  void equip() {
+    Game game = createGame();
+    // this character has only one wearable in its inventory, which is also the character's active weapon
+    Character character = game.getWorld().getMapElements().get(0).getInhabitants().get(0);
+
+    // Equip an armor
+    Armor armor = createArmor(1,1,1);
+    character.items.add(armor);
+    assertTrue(character.equipItem(armor));
+
+    // the armor should be in the character's armor list
+    assertTrue(game.equip(character, armor));
+
+    // Equip a weapon
+    Wearable weapon = createWearable(1, true);
+    character.items.add(weapon);
+    assertTrue(game.equip(character,weapon));
+
+    // Illegal equip ( item not in inventory)
+    Wearable item = createWearable(1, true);
+    assertFalse(game.equip(character,item));
   }
 }

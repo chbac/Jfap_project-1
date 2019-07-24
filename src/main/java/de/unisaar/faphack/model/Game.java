@@ -2,6 +2,7 @@ package de.unisaar.faphack.model;
 
 import de.unisaar.faphack.model.effects.MoveEffect;
 import de.unisaar.faphack.model.map.Tile;
+import de.unisaar.faphack.model.map.WallTile;
 import de.unisaar.faphack.model.map.World;
 
 import java.util.List;
@@ -26,12 +27,28 @@ public class Game implements Storable {
   }
 
   /**
+   * tries to move the character into the given direction.
+   * If the character's power == 0 only moves with direction (0,0) are possible, i.e. the character is resting
+   * and its power increases by 5
    * @param whom
    * @param direction
    * @return boolean
    */
   public boolean move(Character whom, Direction direction) {
-    return new MoveEffect(direction).apply(whom);
+	if (whom.getTile().getNextTile(direction) != null
+		&& !(whom.getTile().getNextTile(direction) instanceof WallTile)) {
+			whom.move(whom.getTile().getNextTile(direction));
+			return true;
+		}
+	return false;
+  }
+
+  /**
+   * The character rests, i.e. it moves with direction (0,0) and its power increases by 5
+  */
+  public boolean rest(Character whom){
+    // TODO please implement me!
+    return true;
   }
 
   /**
@@ -52,9 +69,8 @@ public class Game implements Storable {
    * @param item the item to be picked up
    * @return boolean <code>true</code> if the character managed to pickup the item, <code>false</code> otherwise
    */
-  public boolean pickUp(Character who, Item item) {
-    // TODO please implement me!
-    return false;
+  public boolean pickUp(Character who, Wearable what) {
+    return who.pickUp(what);
   }
 
   /**
@@ -64,8 +80,7 @@ public class Game implements Storable {
    * @return <code>true</code> if the action was successful, <code>false</code> otherwise
    */
   public boolean drop(Character who, Wearable what){
-    // TODO please implement me!
-    return false;
+    return who.dropItem(what);
   }
 
   /**
@@ -76,13 +91,13 @@ public class Game implements Storable {
    * @return <code>true</code> the action was successful, <code>false</code> otherwise
    */
   public boolean equip(Character who, Wearable what){
-    // TODO please implement me!
-    return false;
+	return who.equipItem(what);
   }
 
   @Override
   public void marshal(MarshallingContext c) {
-    // TODO please implement me!
+    c.write("world", world);
+    c.write("protagonist", protagonist);
   }
 
   @Override
@@ -96,12 +111,11 @@ public class Game implements Storable {
 
   /** Add the game's protagonist to a random floor tile in the first room */
   public void setProtagonist(Character prot) {
-    // TODO: fill here
+    protagonist = prot;
   }
 
   /** get the game's protagonist */
   public Character getProtagonist(Character prot) {
-    // TODO: fill here
-    return null;
+    return protagonist;
   }
 }
