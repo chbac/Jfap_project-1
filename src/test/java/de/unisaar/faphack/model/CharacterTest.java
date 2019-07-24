@@ -82,6 +82,14 @@ class CharacterTest {
     assertEquals(85, testObject.health);
     assertEquals( 35, testObject.magic);
     assertEquals(1, testObject.power);
+    // use 2 pieces of armor
+    Armor armor1 = TestUtils.createArmor(0.5, 0.0, 0.0);
+    TestUtils.equipArmor(armor1, testObject);
+    characterModifier = TestUtils.createCharacterModifier(-10, -15, -1, 1);
+    testObject.applyAttack(characterModifier);
+    assertEquals(83, testObject.health);
+    assertEquals( 35, testObject.magic);
+    assertEquals(1, testObject.power);
   }
 
   /**

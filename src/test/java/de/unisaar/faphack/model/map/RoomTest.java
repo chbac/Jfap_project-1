@@ -14,7 +14,7 @@ class RoomTest {
    */
   @Test
   void getNextTile() {
-    Room room = TestUtils.createSimpleRoom(4,4, 1);
+    Room room = TestUtils.createSimpleRoom(8,8, 1);
     Tile[][] tiles = room.getTiles();
     // down
     assertEquals(tiles[1][1], room.getNextTile(tiles[2][1],new Direction(-1,0)));
@@ -32,7 +32,7 @@ class RoomTest {
     assertEquals(tiles[3][0], room.getNextTile(tiles[2][1],new Direction(1,-1)));
     // up right
     assertEquals(tiles[3][2], room.getNextTile(tiles[2][1],new Direction(1,1)));
-
-
+    // test corner cases (What happens if we use a direction with x and/or y coordinates that are beyond the rooms borders
+    assertEquals(tiles[7][7], room.getNextTile(tiles[1][1], new Direction(9,9)));
   }
 }
