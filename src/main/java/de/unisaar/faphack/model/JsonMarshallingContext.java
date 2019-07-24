@@ -9,6 +9,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.util.*;
+import java.util.function.BiConsumer;
 
 public class JsonMarshallingContext implements MarshallingContext {
 
@@ -31,19 +32,53 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   @Override
   public void save(Storable s) {
-    // TODO Auto-generated method stub
-	
+	  try (FileWriter f = new FileWriter(file)) {
+		  JSONObject write_this = toJson(s);
+		  f.write(write_this.toJSONString());
+		  f.flush();
+	  } catch (IOException e) {
+		  e.printStackTrace();
+	  }
 	  
   }
 
   public Storable read() {
-    // TODO Auto-generated method stub
+    JSONParser parser = new JSONParser();
+    try {
+    	JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(file));
+    	stack.push(jsonObject);
+    } catch (Exception e) {
+    	e.printStackTrace();
+    }
+    
     return null;
   }
 
+  @SuppressWarnings("unchecked")
+  private JSONObject toJson(Storable s) {
+	  JSONObject output = new JSONObject();
+	  // If not in writecache
+	  if (writecache.get(s) != null) {
+		  // s wasn't in cache, add it and assign new ID
+		  String new_id = s.getClass().getSimpleName()+"@"+String.valueOf(idGenerator++);
+		  output.put("id", new_id);
+		  writecache.put(s, new_id);
+	  } else { // If in writecache
+		  output.put("id", writecache.get(s));
+	  }
+	  
+	  // add to stack so the marshal methods can interact with the JSONObject
+	  stack.push(output);
+	  // do all the needed writes to the jsonobject
+	  s.marshal(this);
+	  
+	  return stack.pop();
+  }
+  
+  @SuppressWarnings("unchecked")
   @Override
   public void write(String key, Storable object) {
-    // TODO Auto-generated method stub
+	  stack.getFirst().put(key, toJson(object));
   }
 
   @Override
@@ -52,9 +87,10 @@ public class JsonMarshallingContext implements MarshallingContext {
     return null;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void write(String key, int object) {
-    // TODO Auto-generated method stub
+    stack.getFirst().put(key, object);
 
   }
 
@@ -64,9 +100,10 @@ public class JsonMarshallingContext implements MarshallingContext {
     return 0;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void write(String key, double object) {
-    // TODO Auto-generated method stub
+    stack.getFirst().put(key, object);
   }
 
   @Override
@@ -75,10 +112,10 @@ public class JsonMarshallingContext implements MarshallingContext {
     return 0;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void write(String key, String object) {
-    // TODO Auto-generated method stub
-
+    stack.getFirst().put(key, object);
   }
 
   @Override
@@ -87,10 +124,10 @@ public class JsonMarshallingContext implements MarshallingContext {
     return null;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void write(String key, Collection<? extends Storable> coll) {
-    // TODO Auto-generated method stub
-
+	  stack.getFirst().put(key, coll.toArray());
   }
 
   @Override
@@ -102,6 +139,11 @@ public class JsonMarshallingContext implements MarshallingContext {
   @Override
   public void write(String key, Tile[][] coll) {
     // TODO Auto-generated method stub
+	  for (Tile[] tlist:coll) {
+		  for (Tile t:tlist) {
+			  
+		  }
+	  }
 
   }
 
