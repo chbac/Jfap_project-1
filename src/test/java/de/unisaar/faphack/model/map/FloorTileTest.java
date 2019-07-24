@@ -17,8 +17,8 @@ class FloorTileTest {
     Character bar = TestUtils.createBaseCharacter("Bar", 2, 2);
     Room room = TestUtils.createSimpleRoom(8,8,1);
     Tile[][] tiles = room.getTiles();
-    TestUtils.placeCharacter(foo, tiles[1][1]);
-    TestUtils.placeCharacter(bar, tiles[2][2]);
+    TestUtils.addCharacter(room, 1,1,foo);
+    TestUtils.addCharacter(room, 2,2,bar);
     // the tile will take character foo as it is not occupied yet
     assertEquals(tiles[1][2], tiles[1][2].willTake(foo));
     // the tile will take character foo as foo already is on even this tile
