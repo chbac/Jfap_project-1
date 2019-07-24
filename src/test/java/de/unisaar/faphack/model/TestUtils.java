@@ -10,8 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TestUtils {
@@ -86,7 +85,7 @@ public class TestUtils {
     // Connect Room 2 and 3 with stairs
     StairTile stairTile1 = (StairTile) room2.getTiles()[7/2][7/2];
     StairTile stairTile2 = (StairTile) room3.getTiles()[4/2][10/2];
-    connectTiles(stairTile1, stairTile2);
+    connectStairTiles(stairTile1, stairTile2,false);
 
     // add two characters to the world
     Character c1 = createBaseCharacter("Foo", 0, 10);
@@ -330,8 +329,9 @@ public class TestUtils {
    * @param t2 the "end" doorTile
    * @return a new instance of stair
    */
-  public static Stair connectTiles(StairTile t1, StairTile t2) {
+  public static Stair connectStairTiles(StairTile t1, StairTile t2, boolean isOneWay) {
     Stair connector = new Stair();
+    modifyField(connector, false, "oneWay", isOneWay);
     modifyField(connector,true,"fromTile", t1);
     modifyField(connector,true,"toTile", t2);
     modifyField(t1, false, "stair", connector);

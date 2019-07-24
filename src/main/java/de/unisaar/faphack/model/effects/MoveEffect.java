@@ -12,10 +12,7 @@ public class MoveEffect implements Effect<Character, Boolean> {
   }
 
   /**
-   * tries to move the character into the given direction.
-   *
    * @param c the character to move
-   * @param d the dirction to move the character (max one tile)
    * @return true if successful, false otherwise
    */
   public Boolean apply(Character c) {
