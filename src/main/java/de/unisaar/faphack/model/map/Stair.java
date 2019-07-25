@@ -31,5 +31,6 @@ public class Stair extends Connector<StairTile> {
   @Override
   public void unmarshal(MarshallingContext c) {
     super.unmarshal(c);
+    oneWay = c.readInt("oneWay") == 1? true: false;
   }
 }
