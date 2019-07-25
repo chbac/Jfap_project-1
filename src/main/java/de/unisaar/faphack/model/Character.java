@@ -126,9 +126,7 @@ implements Storable, TraitedTileOccupier {
    * @return  boolean <code>true</code> if the action was successful, <code>false</code> otherwise
    */
   public boolean pickUp(Wearable what) {
-	if (getWeight() + what.weight <= maxWeight &&
-			//what.getTile() != null &&
-			what.getTile().equals(getTile())) {
+	if (getWeight() + what.weight <= maxWeight && what.getTile().equals(this.getTile())) {
 		currentWeight += what.weight;
 		items.add(what);
 		what.getTile().removeItem(what);
@@ -212,31 +210,23 @@ implements Storable, TraitedTileOccupier {
      * dimensions.
      */
 
-    if(this.armor.size() != 0)  {
-      for(Wearable eachArmor: this.armor)  {
-
-        System.out.println();
-
-        if(eff.health != 0) this.health += eff.health * eachArmor.getCharacterModifier().health;
-        if(eff.magic != 0) this.magic += eff.magic * eachArmor.getCharacterModifier().magic;
-        if(eff.power != 0) this.power += eff.power * eachArmor.getCharacterModifier().power;
+    if(armor.size() != 0)  {
+      for(Armor armorPiece: this.armor)  {
+    	armorPiece.getModifyingEffect().apply(eff);
       }
     }
-    else  {
-      if(eff.health != 0) this.health += eff.health;
-      if(eff.magic != 0) this.magic += eff.magic;
-      if(eff.power != 0) this.power += eff.power;
-    }
+    this.health += eff.health;
+    this.magic += eff.magic;
+    this.power += eff.power;
   }
 
   /**
    * Apply the effects of, e.g., a poisoning, eating something, etc.
    */
   public void applyItem(CharacterModifier eff) {
-
-    if(eff.health != 0) this.health += eff.health;
-    if(eff.magic != 0)  this.magic += eff.magic;
-    if(eff.power != 0)  this.power += eff.power;
+    this.health += eff.health;
+    this.magic += eff.magic;
+    this.power += eff.power;
   }
 
   /**
@@ -247,6 +237,13 @@ implements Storable, TraitedTileOccupier {
   public boolean dropItem(Wearable w){
 	if (items.contains(w)) {
 		items.remove(w);
+		if (armor.contains(w)) {
+			armor.remove(w);
+		}
+		if (activeWeapon != null && activeWeapon.equals(w)) {
+			activeWeapon = null;
+		}
+		currentWeight -= w.weight;
 		getTile().addItem(w);
 		return true;
 	}
@@ -260,7 +257,6 @@ implements Storable, TraitedTileOccupier {
    */
   public boolean equipItem(Wearable w){
     if (items.contains(w) && !armor.contains(w)) {
-    	items.remove(w);
     	if(w.isWeapon) {
     		activeWeapon = w;
     		return true;

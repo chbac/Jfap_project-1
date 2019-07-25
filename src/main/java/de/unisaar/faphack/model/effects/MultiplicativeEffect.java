@@ -25,7 +25,9 @@ public class MultiplicativeEffect extends ModifyingEffect {
    * @return void
    */
   public CharacterModifier apply(CharacterModifier c) {
-    // TODO: FILL THIS
+    c.health *= health;
+    c.magic *= magic;
+    c.power *= power;
     return null;
   }
 

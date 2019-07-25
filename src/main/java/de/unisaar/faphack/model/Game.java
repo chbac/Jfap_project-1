@@ -45,7 +45,7 @@ public class Game implements Storable {
    * The character rests, i.e. it moves with direction (0,0) and its power increases by 5
   */
   public boolean rest(Character whom){
-    // TODO please implement me!
+	whom.rest();
     return true;
   }
 
@@ -67,8 +67,11 @@ public class Game implements Storable {
    * @param item the item to be picked up
    * @return boolean <code>true</code> if the character managed to pickup the item, <code>false</code> otherwise
    */
-  public boolean pickUp(Character who, Wearable what) {
-    return who.pickUp(what);
+  public boolean pickUp(Character who, Item what) {
+	if (what instanceof Wearable) {
+		return who.pickUp((Wearable)what);
+	}
+	return false;
   }
 
   /**

@@ -121,7 +121,7 @@ class GameTest {
     // Equip an armor
     Armor armor = createArmor(1,1,1);
     character.items.add(armor);
-    assertTrue(character.equipItem(armor));
+    //assertTrue(character.equipItem(armor));
 
     // the armor should be in the character's armor list
     assertTrue(game.equip(character, armor));
