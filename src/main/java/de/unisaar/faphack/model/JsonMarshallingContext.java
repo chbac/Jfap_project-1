@@ -201,8 +201,11 @@ public class JsonMarshallingContext implements MarshallingContext {
 		  JSONObject tlist_json = new JSONObject();
 		  
 		  stack.push(tlist_json);
-		  for (Tile t:tlist) {
+		  //for (Tile t:tlist) {
+		  for (int x = 0; x < tlist.length; x++) {
+			  Tile t = tlist[x];
 			  JSONObject tile_json = toJson(t);
+			  tile_json.put("index", x);
 			  stack.getFirst().put(writecache.get(t), tile_json);
 		  }
 		  tlist_json = stack.pop();
@@ -210,16 +213,21 @@ public class JsonMarshallingContext implements MarshallingContext {
 		  i++;
 	  }
 	  room_json = stack.pop();
+	  room_json.put("array_length", i);
 	  stack.getFirst().put(key, room_json);
   }
 
   @Override
   public Tile[][] readBoard(String key) {
-	  Tile[][] output = null;
-	  
 	  stack.push((JSONObject) stack.getFirst().get(key));
-	  for (Object tlist : stack.getFirst().keySet()) {
-		  
+	  int length = (int) stack.getFirst().get("array_length");
+	  Tile[][] output = new Tile[length][]; 
+	  for (Object index : stack.getFirst().keySet()) {
+		  Tile[] tlist = new Tile[length];
+		  for (int i = 0; i < tlist.length; i++) {
+			  
+			  tlist[i] = null;
+		  }
 	  }
 	  stack.pop();
 	  
