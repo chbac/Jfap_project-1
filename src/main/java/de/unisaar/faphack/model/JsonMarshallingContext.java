@@ -191,6 +191,13 @@ public class JsonMarshallingContext implements MarshallingContext {
   public void readAll(String key, Collection<? extends Storable> coll) {
     JSONObject coll_json = new JSONObject();
     
+    stack.push((JSONObject)stack.getFirst().get(key));
+    
+    for (Storable s : coll) {
+    	
+    }
+    
+    stack.pop();
 
   }
 
@@ -227,13 +234,26 @@ public class JsonMarshallingContext implements MarshallingContext {
 	  stack.push((JSONObject) stack.getFirst().get(key));
 	  int length = (int) stack.getFirst().get("array_length");
 	  Tile[][] output = new Tile[length][]; 
+	  Storable t = null;
+	  
 	  for (Object index : stack.getFirst().keySet()) {
 		  stack.push((JSONObject) stack.getFirst().get(index));
 		  Tile[] tlist = new Tile[length];
-		  for (int i = 0; i < tlist.length; i++) {
-			  
-			  tlist[i] = null;
+		  for (Object tile_id : stack.getFirst().keySet()) {
+			  JSONObject tile_json = (JSONObject) stack.getFirst().get(tile_id);
+			  stack.push(tile_json);
+			  if (readcache.get(tile_id) != null) {
+				  t = readcache.get(tile_id); 
+			  } else {
+				  String temp_id = (String) tile_id;
+				  String clazz = temp_id.substring(0, temp_id.indexOf("@"));
+				  t = factory.newInstance(clazz);
+				  t.unmarshal(this);
+			  }
+			  tlist[(int) stack.getFirst().get("index")] = (Tile) t;
+			  stack.pop();
 		  }
+		  output[(int) index] = tlist;
 		  stack.pop();
 	  }
 	  stack.pop();
