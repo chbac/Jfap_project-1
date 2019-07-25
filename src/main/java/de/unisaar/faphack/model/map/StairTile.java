@@ -52,6 +52,9 @@ public class StairTile extends Tile {
   @Override
   public void unmarshal(MarshallingContext c) {
     super.unmarshal(c);
+    stair = c.read("stair");
+    trap = c.read("trap");
+    trait = c.read("trait");
   }
 
   public Stair getStair(){
