@@ -104,6 +104,15 @@ implements Storable, TraitedTileOccupier {
    * @return void
    */
   public void move(Tile destination) {
+    if (tile != null) {
+      Room current = tile.getRoom();
+      if (destination.getRoom() != current) {
+        current.getInhabitants().remove(this);
+        destination.getRoom().getInhabitants().add(this);
+      }
+    } else {
+      destination.getRoom().getInhabitants().add(this);
+    }
     tile = destination;
   }
 
