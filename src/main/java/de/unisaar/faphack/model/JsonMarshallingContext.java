@@ -215,8 +215,15 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   @Override
   public Tile[][] readBoard(String key) {
-    // TODO Auto-generated method stub
-    return null;
+	  Tile[][] output = null;
+	  
+	  stack.push((JSONObject) stack.getFirst().get(key));
+	  for (Object tlist : stack.getFirst().keySet()) {
+		  
+	  }
+	  stack.pop();
+	  
+    return output;
   }
 
 }
