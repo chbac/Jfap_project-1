@@ -46,12 +46,15 @@ public class Wearable extends Item {
 	character = c.read("character");
 	isWeapon = (c.readInt("isWeapon") != 0);
   }
-
+  
   public void pickUp(Character c) {
-    c.pickUp(this);
+    character = c;
+    onTile = null;
   }
 
   public void drop(Tile t) {
+	character = null;
+	onTile = t;
     t.addItem(this);
   }
 }

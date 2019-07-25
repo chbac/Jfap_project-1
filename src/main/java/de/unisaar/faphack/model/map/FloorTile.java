@@ -38,6 +38,7 @@ public class FloorTile extends Tile {
    */
   @Override
   public Tile willTake(Character c) {
+	  if (c.getTile() == this) return this;
 	  if (isOccupied(c)) return null;
     return this;
   }
@@ -77,8 +78,8 @@ public class FloorTile extends Tile {
    */
   @Override
   public boolean isOccupied(Character character){
-    if (this.equals(character.getTile())) {
-    	return true;
+    for (Character c : room.getInhabitants()) {
+    	if (c.getTile() == this) return true;
     }
     return false;
   }

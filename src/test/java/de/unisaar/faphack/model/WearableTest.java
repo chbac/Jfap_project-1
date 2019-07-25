@@ -16,7 +16,7 @@ class WearableTest {
     assertEquals(character, item.character);
     assertNull(item.onTile);
   }
-
+  
   @Test
   void drop() {
     Wearable item = TestUtils.createWearable(1,false);
