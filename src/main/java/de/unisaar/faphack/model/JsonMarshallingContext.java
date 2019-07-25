@@ -185,7 +185,8 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   @Override
   public void readAll(String key, Collection<? extends Storable> coll) {
-    // TODO Auto-generated method stub
+    JSONObject coll_json = new JSONObject();
+    
 
   }
 
