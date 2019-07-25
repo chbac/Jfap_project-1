@@ -90,7 +90,7 @@ public class Game implements Storable {
    * @param what the item to be equipped
    * @return <code>true</code> the action was successful, <code>false</code> otherwise
    */
-  public boolean equip(Character who, Armor what){
+  public boolean equip(Character who, Wearable what){
 	return who.equipItem(what);
   }
 

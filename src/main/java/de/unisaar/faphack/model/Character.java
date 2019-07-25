@@ -202,14 +202,32 @@ implements Storable, TraitedTileOccupier {
      * stamina, quality of different armors, possibly even in the different
      * dimensions.
      */
-	activeEffects.add(eff);
+
+    if(this.armor.size() != 0)  {
+      for(Wearable eachArmor: this.armor)  {
+
+        System.out.println();
+
+        if(eff.health != 0) this.health += eff.health * eachArmor.getCharacterModifier().health;
+        if(eff.magic != 0) this.magic += eff.magic * eachArmor.getCharacterModifier().magic;
+        if(eff.power != 0) this.power += eff.power * eachArmor.getCharacterModifier().power;
+      }
+    }
+    else  {
+      if(eff.health != 0) this.health += eff.health;
+      if(eff.magic != 0) this.magic += eff.magic;
+      if(eff.power != 0) this.power += eff.power;
+    }
   }
 
   /**
    * Apply the effects of, e.g., a poisoning, eating something, etc.
    */
   public void applyItem(CharacterModifier eff) {
-	  activeEffects.add(eff);
+
+    if(eff.health != 0) this.health += eff.health;
+    if(eff.magic != 0)  this.magic += eff.magic;
+    if(eff.power != 0)  this.power += eff.power;
   }
 
   /**
@@ -231,11 +249,16 @@ implements Storable, TraitedTileOccupier {
    * @param wearable the item to be equipped
    * @return <code>true</code> the action was successful, <code>false</code> otherwise
    */
-  public boolean equipItem(Armor a){
-    if (items.contains(a) && !armor.contains(a)) {
-    	items.remove(a);
-    	armor.add(a);
-    	return true;
+  public boolean equipItem(Wearable w){
+    if (items.contains(w) && !armor.contains(w)) {
+    	items.remove(w);
+    	if(w.isWeapon) {
+    		activeWeapon = w;
+    		return true;
+    	} else if(w instanceof Armor) {
+    		armor.add((Armor)w);
+    		return true;
+    	}
     }
     return false;
   }

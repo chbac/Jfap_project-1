@@ -82,7 +82,10 @@ public abstract class Tile implements Storable, TraitOwner {
   }
 
   public void marshal(MarshallingContext c) {
-    // TODO please implement me!
+    c.write("x", x);
+    c.write("y", y);
+    c.write("room", room);
+    c.write("trait", trait);
   }
 
   public void unmarshal(MarshallingContext c) {

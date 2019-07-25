@@ -43,12 +43,15 @@ public class StairTile extends Tile {
 
   @Override
   public void marshal(MarshallingContext c) {
-    // TODO please implement me!
+    super.marshal(c);
+    c.write("stair", stair);
+    c.write("trap", trap);
+    c.write("trait", trait);
   }
 
   @Override
   public void unmarshal(MarshallingContext c) {
-    // TODO please implement me!
+    super.unmarshal(c);
   }
 
   public Stair getStair(){
