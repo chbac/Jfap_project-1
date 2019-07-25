@@ -76,13 +76,9 @@ public class FloorTile extends Tile {
    * @return true if the tile is occupied by a character
    */
   @Override
-  public boolean isOccupied(){
-    for (Character c:room.getInhabitants()) {
-    	if (c.getTile().equals(this)) {
-    		return false;
-    	}
-    }
-    return true;
+  public boolean isOccupied(Character character){
+    // TODO please implement me!
+    return false;
   }
 
 }

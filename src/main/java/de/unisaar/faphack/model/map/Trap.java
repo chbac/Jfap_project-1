@@ -1,5 +1,6 @@
 package de.unisaar.faphack.model.map;
 
+import de.unisaar.faphack.model.CharacterModifier;
 import de.unisaar.faphack.model.Fixtures;
 import de.unisaar.faphack.model.MarshallingContext;
 
@@ -17,6 +18,8 @@ public class Trap extends Fixtures {
    *
    */
   protected StairTile trapDoor = null;
+
+  protected CharacterModifier modifier;
 
   public Trap() {
 
