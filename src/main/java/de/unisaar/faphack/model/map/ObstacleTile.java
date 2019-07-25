@@ -21,5 +21,6 @@ public class ObstacleTile extends WallTile {
   @Override
   public void unmarshal(MarshallingContext c) {
     super.unmarshal(c);
+    trait = c.read("trait");
   }
 }

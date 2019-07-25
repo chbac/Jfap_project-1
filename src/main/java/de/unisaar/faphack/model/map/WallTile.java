@@ -49,5 +49,7 @@ public class WallTile extends Tile {
   @Override
   public void unmarshal(MarshallingContext c) {
     super.unmarshal(c);
+    destructible = c.readInt("destructible");
+    trait = c.read("trait");
   }
 }

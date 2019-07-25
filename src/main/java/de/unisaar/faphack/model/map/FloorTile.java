@@ -67,6 +67,8 @@ public class FloorTile extends Tile {
   @Override
   public void unmarshal(MarshallingContext c) {
     super.unmarshal(c);
+    items = c.read("items");
+    trait = c.read("trait");
   }
 
   /**
