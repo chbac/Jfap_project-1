@@ -21,7 +21,7 @@ implements Storable, TraitedTileOccupier {
    * 
    */
   private int level = 0;
-
+  
   /**
    * The position of the character.
    */
@@ -130,8 +130,7 @@ implements Storable, TraitedTileOccupier {
 		currentWeight += what.weight;
 		items.add(what);
 		what.getTile().removeItem(what);
-		what.character = this;
-		what.onTile = null;
+		what.pickUp(this);
 		return true;
 	}
 	return false;

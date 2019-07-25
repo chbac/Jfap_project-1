@@ -42,9 +42,10 @@ public class Wearable extends Item {
   public void unmarshal(MarshallingContext c) {
 	super.unmarshal(c);
   }
-
+  
   public void pickUp(Character c) {
-    c.pickUp(this);
+    character = c;
+    onTile = null;
   }
 
   public void drop(Tile t) {
