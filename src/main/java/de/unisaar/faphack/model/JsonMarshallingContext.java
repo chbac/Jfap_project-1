@@ -1,5 +1,6 @@
 package de.unisaar.faphack.model;
 
+import de.unisaar.faphack.model.map.Room;
 import de.unisaar.faphack.model.map.Tile;
 import org.json.simple.JSONArray;
 
@@ -108,8 +109,7 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   @Override
   public int readInt(String key) {
-    // TODO Auto-generated method stub
-    return 0;
+    return (int)stack.getFirst().get(key);
   }
 
   @SuppressWarnings("unchecked")
@@ -139,12 +139,14 @@ public class JsonMarshallingContext implements MarshallingContext {
   @SuppressWarnings("unchecked")
   @Override
   public void write(String key, Collection<? extends Storable> coll) {
+	  JSONObject coll_json = new JSONObject();
+	  stack.push(coll_json);
 	  for (Storable s : coll) {
-		  if (s instanceof Room) {
-			 
-		  }
+		  JSONObject converted_storable = toJson(s);
+		  stack.getFirst().put(writecache.get(s), converted_storable);
 	  }
-	  stack.getFirst().put(key, coll);
+	  coll_json = stack.pop();
+	  stack.getFirst().put(key, coll_json);
   }
 
   @Override
@@ -153,13 +155,25 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void write(String key, Tile[][] coll) {
-    // TODO Auto-generated method stub
+	  JSONObject room_json = new JSONObject();
+	  stack.push(room_json);
+	  int i = 0;
 	  for (Tile[] tlist:coll) {
+	  //for (int x = 0; x < coll.length; x++) {
+	  //  Tile[] tlist = coll[x];
+		  JSONObject tlist_json = new JSONObject();
+		  
+		  stack.push(tlist_json);
 		  for (Tile t:tlist) {
-			  
+			  JSONObject tile_json = toJson(t);
+			  stack.getFirst().put(writecache.get(t), tile_json);
 		  }
+		  tlist_json = stack.pop();
+		  stack.getFirst().put(i, tlist_json);
+		  i++;
 	  }
 
   }
