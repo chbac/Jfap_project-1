@@ -47,17 +47,38 @@ public class JsonMarshallingContext implements MarshallingContext {
   }
 
   public Storable read() {
+	// Initialise variables
     JSONParser parser = new JSONParser();
+    JSONObject jsonObject = null;
+    Storable output = null;
+    
+    // Try reading and parsing the file
     try {
-    	JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(file));
+    	jsonObject = (JSONObject) parser.parse(new FileReader(file));
     	stack.push(jsonObject);
     } catch (Exception e) {
     	e.printStackTrace();
     }
     
-    return null;
+    // Handle cache and object creation
+    String curr_id = (String) jsonObject.get("id");
+    if (readcache.get(curr_id) == null) {
+    	int index_at = curr_id.indexOf("@");
+    	String clazz = curr_id.substring(0,index_at);
+    	output = factory.newInstance(clazz);
+    	readcache.put(curr_id, output);
+    } else {
+    	output = readcache.get(curr_id);
+    }
+    // Fill fields of newly created object
+    stack.push(jsonObject);
+    output.unmarshal(this);
+    stack.pop();
+    
+    // return the object
+    return output;
   }
-
+  
   @SuppressWarnings("unchecked")
   private JSONObject toJson(Storable s) {
 	  JSONObject output = new JSONObject();
@@ -94,10 +115,25 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T extends Storable> T read(String key) {
-    // TODO Auto-generated method stub
-    return null;
+	  Storable output = null;
+	  // put storable to be read on stack
+	  stack.push((JSONObject) stack.getFirst().get(key));
+	  
+	  // check readcache
+	  String curr_id = (String) stack.getFirst().get("id");
+	  if (readcache.get(curr_id) == null) {
+		  int index_at = curr_id.indexOf("@");
+		  String clazz = curr_id.substring(0,index_at);
+		  output = factory.newInstance(clazz);
+		  readcache.put(curr_id, output);
+	  } else {
+		  output = readcache.get(stack.getFirst().get("id"));
+	  }
+	stack.pop();
+    return (T) output;
   }
 
   @SuppressWarnings("unchecked")
@@ -120,8 +156,7 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   @Override
   public double readDouble(String key) {
-    // TODO Auto-generated method stub
-    return 0;
+    return (double) stack.getFirst().get(key);
   }
 
   @SuppressWarnings("unchecked")
@@ -132,8 +167,7 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   @Override
   public String readString(String key) {
-    // TODO Auto-generated method stub
-    return null;
+    return (String) stack.getFirst().get(key);
   }
 
   @SuppressWarnings("unchecked")
@@ -175,7 +209,8 @@ public class JsonMarshallingContext implements MarshallingContext {
 		  stack.getFirst().put(i, tlist_json);
 		  i++;
 	  }
-
+	  room_json = stack.pop();
+	  stack.getFirst().put(key, room_json);
   }
 
   @Override
