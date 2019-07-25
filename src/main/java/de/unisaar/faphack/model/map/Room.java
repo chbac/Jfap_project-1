@@ -42,15 +42,35 @@ public class Room implements Storable {
    * @return
    */
   public Tile getNextTile(Tile t, Direction d) {
-	int xNew = t.x + d.x;
-	int yNew = t.y + d.y;
-
-	if (tiles.length >= xNew && xNew >= 0) {
-		if (tiles[xNew].length >= yNew && yNew >= 0) {
-			return tiles[xNew][yNew];
-		}
+	int xNew;
+	int yNew;
+	
+	// x
+	if (t.x + d.x < 0) {
+		xNew = 1;
+	} else if (t.x + d.x >= tiles.length) {
+		xNew = tiles.length - 1;
+	} else {
+		xNew = t.x + d.x;
 	}
-    return null;
+	
+	// y
+	if (t.y + d.y < 0) {
+		yNew = 1;
+	} else if (t.y + d.y >= tiles[xNew].length) {
+		yNew = tiles[xNew].length - 1;
+	} else {
+		yNew = t.y + d.y;
+	}
+
+	return tiles[xNew][yNew];
+	
+	//	if (tiles.length >= xNew && xNew >= 0) {
+	//		if (tiles[xNew].length >= yNew && yNew >= 0) {
+	//			return tiles[xNew][yNew];
+	//		}
+	//	}
+	//    return t;
   }
 
 
@@ -100,5 +120,14 @@ public class Room implements Storable {
     w = c.read("world");
     inhabitants = c.read("inhabitants");
     tiles = c.readBoard("tiles");
+  }
+  
+  private boolean containsTile(Tile t) {
+	  for (Tile[] tl : tiles) {
+		  for (Tile tile : tl) {
+			  if (tile.equals(t)) return true;
+		  }
+	  }
+	  return false;
   }
 }

@@ -24,6 +24,7 @@ public class MoveEffect implements Effect<Character, Boolean> {
    */
   public Boolean apply(Character c) {
 	if (c.getTile().willTake(c) != null 
+			&& c.getPower() > 0
 			&& !(c.getTile().getNextTile(dir) instanceof WallTile)) {
 		c.move(c.getTile().getNextTile(dir));
 		return true;
