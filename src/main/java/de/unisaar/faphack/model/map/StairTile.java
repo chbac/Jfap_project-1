@@ -31,8 +31,12 @@ public class StairTile extends Tile {
    */
   @Override
   public Tile willTake(Character c) {
-    // TODO please implement me!
-   return null;
+    Tile returnTile;
+    if(stair.onlyDown())
+      returnTile = this.equals(stair.fromTile)? stair.toTile: null;
+    else
+      returnTile = this.equals(stair.fromTile)? stair.toTile: stair.fromTile;
+    return returnTile;
   }
 
   /** Return non-null if this is a trap */
