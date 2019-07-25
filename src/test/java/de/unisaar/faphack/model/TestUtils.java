@@ -170,7 +170,7 @@ public class TestUtils {
    * @param character
    */
   public static void addCharacter(Room room, int x, int y, Character character){
-    List<Character> inhabitants = new ArrayList<>();
+    List<Character> inhabitants = room.getInhabitants();
     inhabitants.add(character);
     modifyField(room,false, "inhabitants", inhabitants);
     placeCharacter(character,room.getTiles()[x][y]);
