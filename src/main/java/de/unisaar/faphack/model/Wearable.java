@@ -49,6 +49,8 @@ public class Wearable extends Item {
   }
 
   public void drop(Tile t) {
+	character = null;
+	onTile = t;
     t.addItem(this);
   }
 }
