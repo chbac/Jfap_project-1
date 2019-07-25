@@ -28,12 +28,12 @@ public class Armor extends Wearable {
   @Override
   public void marshal(MarshallingContext c) {
     super.marshal(c);
-    c.write("modifyingEffect", character);
+    c.write("modifyingEffect", modifyingEffect);
   }
 
   @Override
   public void unmarshal(MarshallingContext c) {
     super.unmarshal(c);
-    character = c.read("modifyingEffect");
+    modifyingEffect = c.read("modifyingEffect");
   }
 }

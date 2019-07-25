@@ -48,6 +48,8 @@ implements Effect<CharacterModifier, CharacterModifier>, Storable {
 
   @Override
   public void unmarshal(MarshallingContext c) {
-    // TODO: FILL THIS
+    health = c.readDouble("health");
+    magic = c.readDouble("magic");
+    power = c.readDouble("power");
   }
 }

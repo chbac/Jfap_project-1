@@ -28,7 +28,7 @@ public class MultiplicativeEffect extends ModifyingEffect {
     c.health *= health;
     c.magic *= magic;
     c.power *= power;
-    return null;
+    return c;
   }
 
 }

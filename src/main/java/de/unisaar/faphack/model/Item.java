@@ -31,11 +31,13 @@ implements Storable, TraitedTileOccupier {
   public void marshal(MarshallingContext c) {
     c.write("tile", onTile);
     c.write("trait", trait);
-    c.write("characterModifier", effect);
+    c.write("effect", effect);
   }
 
   public void unmarshal(MarshallingContext c) {
-    // TODO please implement me!
+    onTile = c.read("tile");
+    trait = c.readString("trait");
+    effect = c.read("effect");
   }
 
   @Override

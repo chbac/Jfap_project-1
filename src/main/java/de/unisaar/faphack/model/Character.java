@@ -290,7 +290,19 @@ implements Storable, TraitedTileOccupier {
 
   @Override
   public void unmarshal(MarshallingContext c) {
-    // TODO please implement me!
+    level = c.readInt("level");
+    health = c.readInt("health");
+    magic = c.readInt("magic");
+    power = c.readInt("power");
+    items = c.read("items");
+    skills = c.read("skills");
+    armor = c.read("armor");
+    maxWeight = c.readInt("maxWeight");
+    currentWeight = c.readInt("currentWeight");
+    activeEffects = c.read("activeEffects");
+    role = c.readString("role");
+    name = c.readString("name");
+    activeWeapon = c.read("activeWeapon");
   }
 
   public void rest() {
