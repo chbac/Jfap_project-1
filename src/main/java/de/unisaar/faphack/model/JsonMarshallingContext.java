@@ -135,6 +135,10 @@ public class JsonMarshallingContext implements MarshallingContext {
 	stack.pop();
     return (T) output;
   }
+  
+//  private <T extends Storable> T fromJson(String key) {
+//	  return null;
+//  }
 
   @SuppressWarnings("unchecked")
   @Override
@@ -224,11 +228,13 @@ public class JsonMarshallingContext implements MarshallingContext {
 	  int length = (int) stack.getFirst().get("array_length");
 	  Tile[][] output = new Tile[length][]; 
 	  for (Object index : stack.getFirst().keySet()) {
+		  stack.push((JSONObject) stack.getFirst().get(index));
 		  Tile[] tlist = new Tile[length];
 		  for (int i = 0; i < tlist.length; i++) {
 			  
 			  tlist[i] = null;
 		  }
+		  stack.pop();
 	  }
 	  stack.pop();
 	  
