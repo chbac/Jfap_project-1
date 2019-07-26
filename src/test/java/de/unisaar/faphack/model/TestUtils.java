@@ -202,9 +202,23 @@ public class TestUtils {
     List<Room> mapElements = testObject.getMapElements();
     assertEquals(3, mapElements.size());
     // Test if the rooms are instantiated and connected correctly
-    Room r1 = mapElements.get(0);
-    Room r2 = mapElements.get(1);
-    Room r3 = mapElements.get(2);
+    Room r1 = null;
+    Room r2 = null;
+    Room r3 = null;
+    for(Room r : mapElements){
+      if(r.getTiles().length == 8 && r.getTiles()[0].length == 8){
+        r1 = r;
+      } else if(r.getTiles().length == 7 && r.getTiles()[0].length == 7){
+        r2 = r;
+      } else if(r.getTiles().length == 4 && r.getTiles()[0].length == 10){
+        r3 = r;
+      }
+
+    }
+    // Test if the rooms are instantiated and connected correctly
+    assertNotNull(r1);
+    assertNotNull(r2);
+    assertNotNull(r3);
     // r1 should be of size [8][8], have a door at [0][4]
     assertEquals(8,r1.getTiles().length);
     assertEquals(8,r1.getTiles()[0].length);
