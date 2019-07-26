@@ -82,21 +82,22 @@ public class JsonMarshallingContext implements MarshallingContext {
   private JSONObject toJson(Storable s) {
 	  JSONObject output = new JSONObject();
 	  // If not in writecache
-	  if (writecache.get(s) == null) {
+	  if (!writecache.containsKey(s)) {
 		  // s wasn't in cache, add it and assign new ID
 		  String new_id = s.getClass().getSimpleName()+"@"+String.valueOf(idGenerator++);
 		  output.put("id", new_id);
 		  writecache.put(s, new_id);
+		  stack.push(output);
+		  s.marshal(this);
+		  output = stack.pop();
 	  } else { // If in writecache
 		  output.put("id", writecache.get(s));
+		  
 	  }
 	  
-	  // add to stack so the marshal methods can interact with the JSONObject
-	  stack.push(output);
-	  // do all the needed writes to the jsonobject
-	  s.marshal(this);
+
 	  
-	  return stack.pop();
+	  return output;
   }
   
   /** Create object from Jsonobject*/
@@ -104,13 +105,21 @@ public class JsonMarshallingContext implements MarshallingContext {
   private <T extends Storable> T fromJson(JSONObject json) {
 	  String id = (String) json.get("id");
 	  Storable t = null;
-	  if (readcache.get(id) != null) {
-		  t = readcache.get(id); 
+	  
+	  if (readcache.containsKey(id)) {
+		  // if only id
+		  t = readcache.get(id);
+		  if (json.keySet().size() != 1) {
+			  t.unmarshal(this);
+		  }
 	  } else {
 		  String clazz = id.substring(0, id.indexOf("@"));
 		  t = factory.newInstance(clazz);
 		  readcache.put(id, t);
-		  t.unmarshal(this);
+		  if (json.keySet().size() != 1) {
+			  t.unmarshal(this); 
+		  }
+		 
 	  }
 	  
 	  return (T) t;
@@ -248,12 +257,12 @@ public class JsonMarshallingContext implements MarshallingContext {
 		  JSONObject tlist_json = new JSONObject();
 		  
 		  stack.push(tlist_json);
+		  //for (Tile t:tlist) {
 		  for (int x = 0; x < tlist.length; x++) {
-			 // System.out.println("x = " + String.valueOf(x));
 			  Tile t = tlist[x];
 			  JSONObject tile_json = toJson(t);
 			  tile_json.put("index", x);
-			  //stack.getFirst().put(writecache.get(t), tile_json);
+			  stack.getFirst().put(writecache.get(t), tile_json);
 			  if (x > j) j = x;
 		  }
 		  tlist_json = stack.pop();
@@ -269,6 +278,8 @@ public class JsonMarshallingContext implements MarshallingContext {
   @Override
   public Tile[][] readBoard(String key) {
 	  stack.push((JSONObject) stack.getFirst().get(key));
+//	  if (readcache.containsKey(stack.getFirst().get("id"))) {
+//	  }
 	  int length = Integer.parseInt(stack.getFirst().get("array_length").toString());
 	  int width = Integer.parseInt(stack.getFirst().get("array_width").toString());
 	  Tile[][] output = new Tile[length][width]; 
