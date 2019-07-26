@@ -1,6 +1,5 @@
 package de.unisaar.faphack.model;
 
-import de.unisaar.faphack.model.effects.MoveEffect;
 import de.unisaar.faphack.model.map.Tile;
 import de.unisaar.faphack.model.map.WallTile;
 import de.unisaar.faphack.model.map.World;
@@ -33,6 +32,7 @@ public class Game implements Storable {
    * @return boolean
    */
   public boolean move(Character whom, Direction direction) {
+	/* only move if there exists a tile in the direction, and that tile is not a walltile */
 	if (whom.getTile().getNextTile(direction) != null
 		&& !(whom.getTile().getNextTile(direction) instanceof WallTile)) {
 			whom.move(whom.getTile().getNextTile(direction));
@@ -68,6 +68,7 @@ public class Game implements Storable {
    * @return boolean <code>true</code> if the character managed to pickup the item, <code>false</code> otherwise
    */
   public boolean pickUp(Character who, Item what) {
+	/* of course, the item has to be a wearable */
 	if (what instanceof Wearable) {
 		return who.pickUp((Wearable)what);
 	}

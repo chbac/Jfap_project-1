@@ -45,7 +45,11 @@ public class Room implements Storable {
 	int xNew;
 	int yNew;
 	
-	// x
+	/*
+	 * checking if the character is in danger of transgressing the borders of the board
+	 * */
+	
+	/* in x direction */
 	if (t.x + d.x < 0) {
 		xNew = 1;
 	} else if (t.x + d.x >= tiles.length) {
@@ -54,7 +58,7 @@ public class Room implements Storable {
 		xNew = t.x + d.x;
 	}
 	
-	// y
+	/* in y direction */
 	if (t.y + d.y < 0) {
 		yNew = 1;
 	} else if (t.y + d.y >= tiles[xNew].length) {
@@ -122,12 +126,12 @@ public class Room implements Storable {
     tiles = c.readBoard("tiles");
   }
   
-  private boolean containsTile(Tile t) {
-	  for (Tile[] tl : tiles) {
-		  for (Tile tile : tl) {
-			  if (tile.equals(t)) return true;
-		  }
-	  }
-	  return false;
-  }
+//  private boolean containsTile(Tile t) {
+//	  for (Tile[] tl : tiles) {
+//		  for (Tile tile : tl) {
+//			  if (tile.equals(t)) return true;
+//		  }
+//	  }
+//	  return false;
+//  }
 }
