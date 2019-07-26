@@ -293,12 +293,12 @@ implements Storable, TraitedTileOccupier {
     health = c.readInt("health");
     magic = c.readInt("magic");
     power = c.readInt("power");
-    items = c.read("items");
+    c.readAll("items", items);
     skills = c.read("skills");
-    armor = c.read("armor");
+    c.readAll("armor", armor);
     maxWeight = c.readInt("maxWeight");
     currentWeight = c.readInt("currentWeight");
-    activeEffects = c.read("activeEffects");
+    c.readAll("activeEffects", activeEffects);
     role = c.readString("role");
     name = c.readString("name");
     activeWeapon = c.read("activeWeapon");

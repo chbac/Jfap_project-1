@@ -21,8 +21,12 @@ public class CharacterModifier implements Storable {
    * Apply the changes of this modifier to c, but only if howLong is not zero
    */
   public boolean applyTo(Character c) {
-    // TODO please implement me!
-    return false;
+	if (c.activeEffects.contains(this)) {
+		return false;
+	} else {
+		c.activeEffects.add(this);
+		return true;
+	}
   }
 
   public int howLong() {

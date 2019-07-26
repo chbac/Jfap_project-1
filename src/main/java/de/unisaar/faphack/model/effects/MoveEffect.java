@@ -10,7 +10,7 @@ public class MoveEffect implements Effect<Character, Boolean> {
 
   public MoveEffect(Direction d) throws IllegalArgumentException {
 	if (Math.abs(d.x) > 1 || Math.abs(d.y) > 1) {
-		throw new IllegalArgumentException("bla");
+		throw new IllegalArgumentException("One step a time!");
 	}
 	dir = d;
   }

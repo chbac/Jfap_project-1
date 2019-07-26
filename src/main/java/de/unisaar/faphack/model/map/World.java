@@ -27,7 +27,7 @@ public class World implements Storable {
   @Override
   public void unmarshal(MarshallingContext c) {
     g = c.read("game");
-    mapElements = c.read("rooms");
+    c.readAll("mapElements", mapElements);
   }
 
   public List<Room> getMapElements(){

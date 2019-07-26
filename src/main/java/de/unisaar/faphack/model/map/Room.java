@@ -118,7 +118,7 @@ public class Room implements Storable {
   @Override
   public void unmarshal(MarshallingContext c) {
     w = c.read("world");
-    inhabitants = c.read("inhabitants");
+    c.readAll("inhabitants", inhabitants);
     tiles = c.readBoard("tiles");
   }
   
