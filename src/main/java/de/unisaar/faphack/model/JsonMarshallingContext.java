@@ -102,6 +102,7 @@ public class JsonMarshallingContext implements MarshallingContext {
   /** Create object from Jsonobject*/
   @SuppressWarnings("unchecked")
   private <T extends Storable> T fromJson(JSONObject json) {
+	  System.out.println(json);
 	  String id = (String) json.get("id");
 	  Storable t = null;
 	  if (readcache.get(id) != null) {
@@ -224,8 +225,11 @@ public class JsonMarshallingContext implements MarshallingContext {
     JSONObject coll_json = (JSONObject) stack.getFirst().get(key);
     System.out.println(coll_json);
     System.out.println("Why");
+    // handle empty coll
+    if (coll_json == null) return;
+    // handle non-empty coll
     for (Object id : coll_json.keySet()) {
-    	JSONObject coll_element_json = (JSONObject) stack.getFirst().get(id);
+    	JSONObject coll_element_json = (JSONObject) coll_json.get(id);
     	
     	coll.add(fromJson(coll_element_json));
     }
