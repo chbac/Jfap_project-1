@@ -29,13 +29,13 @@ implements Storable, TraitedTileOccupier {
   }
 
   public void marshal(MarshallingContext c) {
-    c.write("tile", onTile);
+    c.write("onTile", onTile);
     c.write("trait", trait);
     c.write("effect", effect);
   }
 
   public void unmarshal(MarshallingContext c) {
-    onTile = c.read("tile");
+    onTile = c.read("onTile");
     trait = c.readString("trait");
     effect = c.read("effect");
   }

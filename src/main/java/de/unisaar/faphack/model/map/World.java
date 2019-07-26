@@ -3,6 +3,8 @@ package de.unisaar.faphack.model.map;
 import de.unisaar.faphack.model.Game;
 import de.unisaar.faphack.model.MarshallingContext;
 import de.unisaar.faphack.model.Storable;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,14 +14,14 @@ import java.util.List;
 public class World implements Storable {
   public Game g;
 
-  private List<Room> mapElements;
+  private List<Room> mapElements = new ArrayList<Room>();
 
   public World() {}
 
   @Override
   public void marshal(MarshallingContext c) {
 	  c.write("game", g);
-	  c.write("rooms", mapElements);
+	  c.write("mapElements", mapElements);
   }
 
   @Override

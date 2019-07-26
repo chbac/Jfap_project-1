@@ -61,6 +61,7 @@ public class JsonMarshallingContext implements MarshallingContext {
     }
     
     // Handle cache and object creation
+    /**
     String curr_id = (String) jsonObject.get("id");
     if (readcache.get(curr_id) == null) {
     	int index_at = curr_id.indexOf("@");
@@ -69,10 +70,8 @@ public class JsonMarshallingContext implements MarshallingContext {
     	readcache.put(curr_id, output);
     } else {
     	output = readcache.get(curr_id);
-    }
-    // Fill fields of newly created object
-    stack.push(jsonObject);
-    output.unmarshal(this);
+    } */
+    output = fromJson(jsonObject);
     stack.pop();
     
     // return the object
@@ -110,6 +109,7 @@ public class JsonMarshallingContext implements MarshallingContext {
 	  } else {
 		  String clazz = id.substring(0, id.indexOf("@"));
 		  t = factory.newInstance(clazz);
+		  readcache.put(id, t);
 		  t.unmarshal(this);
 	  }
 	  
@@ -134,6 +134,7 @@ public class JsonMarshallingContext implements MarshallingContext {
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Storable> T read(String key) {
+	 /**
 	  Storable output = null;
 	  // put storable to be read on stack
 	  stack.push((JSONObject) stack.getFirst().get(key));
@@ -150,6 +151,21 @@ public class JsonMarshallingContext implements MarshallingContext {
 	  }
 	stack.pop();
     return (T) output;
+    */
+	  
+	  Storable output = null;
+	  
+	  //CHECK READCACHE STRING NOT JSON IF NOT NEW
+	  if (stack.getFirst().get(key) instanceof String) {
+		  return (T) readcache.get(key);
+	  }
+	  if (stack.getFirst().get(key) == null) return null;
+	  JSONObject json =(JSONObject) stack.getFirst().get(key);
+	  stack.push(json);
+	  output = fromJson(json);
+	  stack.pop();
+	  
+	  return (T) output;
   }
   
 //  private <T extends Storable> T fromJson(String key) {
@@ -165,7 +181,7 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   @Override
   public int readInt(String key) {
-    return (int)stack.getFirst().get(key);
+    return Integer.parseInt(stack.getFirst().get(key).toString());
   }
 
   @SuppressWarnings("unchecked")
@@ -206,7 +222,8 @@ public class JsonMarshallingContext implements MarshallingContext {
   @Override
   public void readAll(String key, Collection<? extends Storable> coll) {
     JSONObject coll_json = (JSONObject) stack.getFirst().get(key);
-    
+    System.out.println(coll_json);
+    System.out.println("Why");
     for (Object id : coll_json.keySet()) {
     	JSONObject coll_element_json = (JSONObject) stack.getFirst().get(id);
     	
