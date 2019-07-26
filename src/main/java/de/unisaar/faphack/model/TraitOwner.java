@@ -10,6 +10,7 @@ public interface TraitOwner {
   static final String DOOR = "door";
   static final String OPENDOOR = "open_door";
   static final String WALL = "wall";
+  static final String DESTROYED_WALL = "destroyed_wall";
   static final String STAIR = "stair";
   // Obstacle Tiles
   static final String BOULDER = "boulder";
