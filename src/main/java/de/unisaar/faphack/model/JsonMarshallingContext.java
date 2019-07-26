@@ -100,6 +100,22 @@ public class JsonMarshallingContext implements MarshallingContext {
 	  return stack.pop();
   }
   
+  /** Create object from Jsonobject*/
+  @SuppressWarnings("unchecked")
+  private <T extends Storable> T fromJson(JSONObject json) {
+	  String id = (String) json.get("id");
+	  Storable t = null;
+	  if (readcache.get(id) != null) {
+		  t = readcache.get(id); 
+	  } else {
+		  String clazz = id.substring(0, id.indexOf("@"));
+		  t = factory.newInstance(clazz);
+		  t.unmarshal(this);
+	  }
+	  
+	  return (T) t;
+  }
+  
   @SuppressWarnings("unchecked")
   @Override
   public void write(String key, Storable object) {
@@ -189,15 +205,13 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   @Override
   public void readAll(String key, Collection<? extends Storable> coll) {
-    JSONObject coll_json = new JSONObject();
+    JSONObject coll_json = (JSONObject) stack.getFirst().get(key);
     
-    stack.push((JSONObject)stack.getFirst().get(key));
-    
-    for (Storable s : coll) {
+    for (Object id : coll_json.keySet()) {
+    	JSONObject coll_element_json = (JSONObject) stack.getFirst().get(id);
     	
+    	coll.add(fromJson(coll_element_json));
     }
-    
-    stack.pop();
 
   }
 
