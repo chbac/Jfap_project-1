@@ -253,7 +253,7 @@ public class JsonMarshallingContext implements MarshallingContext {
 			  Tile t = tlist[x];
 			  JSONObject tile_json = toJson(t);
 			  tile_json.put("index", x);
-			  stack.getFirst().put(writecache.get(t), tile_json);
+			  //stack.getFirst().put(writecache.get(t), tile_json);
 			  if (x > j) j = x;
 		  }
 		  tlist_json = stack.pop();
@@ -283,7 +283,6 @@ public class JsonMarshallingContext implements MarshallingContext {
 			  JSONObject tile_json = (JSONObject) stack.getFirst().get(tile_id);
 			  stack.push(tile_json);
 			  t = fromJson(tile_json);
-			  System.out.println(stack.getFirst().get("index"));
 			  tlist[Integer.parseInt(stack.getFirst().get("index").toString())] = (Tile) t;
 			  stack.pop();
 		  }
