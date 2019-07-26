@@ -105,6 +105,7 @@ implements Storable, TraitedTileOccupier {
    */
   public void move(Tile destination) {
     if (tile != null) {
+      /* check if the character is leaving the current room*/
       Room current = tile.getRoom();
       if (destination.getRoom() != current) {
         current.getInhabitants().remove(this);
@@ -126,7 +127,9 @@ implements Storable, TraitedTileOccupier {
    * @return  boolean <code>true</code> if the action was successful, <code>false</code> otherwise
    */
   public boolean pickUp(Wearable what) {
-	if (getWeight() + what.weight <= maxWeight && what.getTile().equals(this.getTile())) {
+	/* check if carrying weight is exceeded before picking up the item */
+	if (getWeight() + what.weight <= maxWeight 
+			&& what.getTile().equals(this.getTile())) {
 		currentWeight += what.weight;
 		items.add(what);
 		what.getTile().removeItem(what);
@@ -236,13 +239,17 @@ implements Storable, TraitedTileOccupier {
   public boolean dropItem(Wearable w){
 	if (items.contains(w)) {
 		items.remove(w);
+		/* armor pieces have to be removed from armor */
 		if (armor.contains(w)) {
 			armor.remove(w);
 		}
+		/* if the item was the active weapon, reset it */
 		if (activeWeapon != null && activeWeapon.equals(w)) {
 			activeWeapon = null;
 		}
+		/* adjust weight */
 		currentWeight -= w.weight;
+		/* put item on tile */
 		getTile().addItem(w);
 		return true;
 	}
@@ -256,6 +263,7 @@ implements Storable, TraitedTileOccupier {
    */
   public boolean equipItem(Wearable w){
     if (items.contains(w) && !armor.contains(w)) {
+    	/* assign a weapon to activeWeapon, add armor pieces to armor */
     	if(w.isWeapon) {
     		activeWeapon = w;
     		return true;
@@ -293,12 +301,12 @@ implements Storable, TraitedTileOccupier {
     health = c.readInt("health");
     magic = c.readInt("magic");
     power = c.readInt("power");
-    items = c.read("items");
+    c.readAll("items", items);
     skills = c.read("skills");
-    armor = c.read("armor");
+    c.readAll("armor", armor);
     maxWeight = c.readInt("maxWeight");
     currentWeight = c.readInt("currentWeight");
-    activeEffects = c.read("activeEffects");
+    c.readAll("activeEffects", activeEffects);
     role = c.readString("role");
     name = c.readString("name");
     activeWeapon = c.read("activeWeapon");

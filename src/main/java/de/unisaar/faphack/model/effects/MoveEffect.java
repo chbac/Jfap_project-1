@@ -8,9 +8,10 @@ import de.unisaar.faphack.model.map.WallTile;
 public class MoveEffect implements Effect<Character, Boolean> {
   private Direction dir;
 
+  /* throw an exception if the absolute value of any dir exceeds 1 */
   public MoveEffect(Direction d) throws IllegalArgumentException {
 	if (Math.abs(d.x) > 1 || Math.abs(d.y) > 1) {
-		throw new IllegalArgumentException("bla");
+		throw new IllegalArgumentException("One step a time!");
 	}
 	dir = d;
   }
@@ -29,6 +30,7 @@ public class MoveEffect implements Effect<Character, Boolean> {
 		c.move(c.getTile().getNextTile(dir));
 		return true;
 	}
+	c.rest();
 	return false;
   
   }

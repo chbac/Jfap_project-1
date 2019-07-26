@@ -33,8 +33,6 @@ class RoomTest {
     // up right
     assertEquals(tiles[3][2], room.getNextTile(tiles[2][1],new Direction(1,1)));
     // test corner cases (What happens if we use a direction with x and/or y coordinates that are beyond the rooms borders
-    System.out.print("x = " + String.valueOf(room.getNextTile(tiles[1][1], new Direction(9,9)).getX()));
-    System.out.print("y = " + String.valueOf(room.getNextTile(tiles[1][1], new Direction(9,9)).getY()));
     assertEquals(tiles[7][7], room.getNextTile(tiles[1][1], new Direction(9,9)));
   }
 }
