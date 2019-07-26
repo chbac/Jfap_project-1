@@ -102,7 +102,6 @@ public class JsonMarshallingContext implements MarshallingContext {
   /** Create object from Jsonobject*/
   @SuppressWarnings("unchecked")
   private <T extends Storable> T fromJson(JSONObject json) {
-	  System.out.println(json);
 	  String id = (String) json.get("id");
 	  Storable t = null;
 	  if (readcache.get(id) != null) {
@@ -223,8 +222,6 @@ public class JsonMarshallingContext implements MarshallingContext {
   @Override
   public void readAll(String key, Collection<? extends Storable> coll) {
     JSONObject coll_json = (JSONObject) stack.getFirst().get(key);
-    System.out.println(coll_json);
-    System.out.println("Why");
     // handle empty coll
     if (coll_json == null) return;
     // handle non-empty coll
@@ -244,18 +241,20 @@ public class JsonMarshallingContext implements MarshallingContext {
 	  JSONObject room_json = new JSONObject();
 	  stack.push(room_json);
 	  int i = 0;
+	  int j = 0;
 	  for (Tile[] tlist:coll) {
 	  //for (int x = 0; x < coll.length; x++) {
 	  //  Tile[] tlist = coll[x];
 		  JSONObject tlist_json = new JSONObject();
 		  
 		  stack.push(tlist_json);
-		  //for (Tile t:tlist) {
 		  for (int x = 0; x < tlist.length; x++) {
+			 // System.out.println("x = " + String.valueOf(x));
 			  Tile t = tlist[x];
 			  JSONObject tile_json = toJson(t);
 			  tile_json.put("index", x);
 			  stack.getFirst().put(writecache.get(t), tile_json);
+			  if (x > j) j = x;
 		  }
 		  tlist_json = stack.pop();
 		  stack.getFirst().put(i, tlist_json);
@@ -263,35 +262,28 @@ public class JsonMarshallingContext implements MarshallingContext {
 	  }
 	  room_json = stack.pop();
 	  room_json.put("array_length", i);
+	  room_json.put("array_width", j+1);
 	  stack.getFirst().put(key, room_json);
   }
 
   @Override
   public Tile[][] readBoard(String key) {
-	  
-	  
-	  
-	  
-	  
 	  stack.push((JSONObject) stack.getFirst().get(key));
 	  int length = Integer.parseInt(stack.getFirst().get("array_length").toString());
-	  Tile[][] output = new Tile[length][]; 
-	  Storable t = null;
+	  int width = Integer.parseInt(stack.getFirst().get("array_width").toString());
+	  Tile[][] output = new Tile[length][width]; 
+	  Tile t = null;
 	  
 	  for (Object index : stack.getFirst().keySet()) {
+		  if (index.equals("array_length")) break;
+		  if (index.equals("array_width")) break;
 		  stack.push((JSONObject) stack.getFirst().get(index));
-		  Tile[] tlist = new Tile[length];
+		  Tile[] tlist = new Tile[width];
 		  for (Object tile_id : stack.getFirst().keySet()) {
 			  JSONObject tile_json = (JSONObject) stack.getFirst().get(tile_id);
 			  stack.push(tile_json);
-			  if (readcache.get(tile_id) != null) {
-				  t = readcache.get(tile_id); 
-			  } else {
-				  String temp_id = (String) tile_id;
-				  String clazz = temp_id.substring(0, temp_id.indexOf("@"));
-				  t = factory.newInstance(clazz);
-				  t.unmarshal(this);
-			  }
+			  t = fromJson(tile_json);
+			  System.out.println(stack.getFirst().get("index"));
 			  tlist[Integer.parseInt(stack.getFirst().get("index").toString())] = (Tile) t;
 			  stack.pop();
 		  }
