@@ -1,308 +1,430 @@
 package de.unisaar.faphack.model;
 
-import de.unisaar.faphack.model.map.Room;
-import de.unisaar.faphack.model.map.Tile;
-import org.json.simple.JSONArray;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.lang.reflect.Field;
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
+import javax.lang.model.element.Element;
+
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
-import java.io.*;
-import java.util.*;
-import java.util.function.BiConsumer;
+import com.sun.tools.javac.parser.ReferenceParser.ParseException;
+
+import de.unisaar.faphack.model.map.Tile;
 
 public class JsonMarshallingContext implements MarshallingContext {
 
-  private final File file;
+	private final File file;
 
-  private static StorableFactory factory;
+	private static StorableFactory factory;
 
-  private IdentityHashMap<Storable, String> writecache;
+	private IdentityHashMap<Storable, String> writecache;
 
-  private Deque<JSONObject> stack;
+	private Deque<JSONObject> stack;
 
-  private Map<String, Storable> readcache;
+	private Map<String, Storable> readcache;
 
-  private int idGenerator = 1;
+	private int idGenerator = 1;
 
-  public JsonMarshallingContext(File f, StorableFactory fact) {
-    file = f;
-    factory = fact;
-    writecache = new IdentityHashMap<Storable, String>();
-    readcache = new HashMap<String, Storable>();
-    stack = new ArrayDeque<JSONObject>();
-  }
+	public JsonMarshallingContext(File f, StorableFactory fact) {
+		file = f;
+		factory = fact;
+		writecache = new IdentityHashMap<Storable, String>();
+		readcache = new HashMap<String, Storable>();
+		stack = new ArrayDeque<JSONObject>();
+	}
 
-  @Override
-  public void save(Storable s) {
-	  try (FileWriter f = new FileWriter(file)) {
-		  JSONObject write_this = toJson(s);
-		  f.write(write_this.toJSONString());
-		  f.flush();
-	  } catch (IOException e) {
-		  e.printStackTrace();
-	  }
-	  
-  }
+	@Override
+	public void save(Storable s) {
+		try (FileWriter f = new FileWriter(file)) {
+			JSONObject game; /** final object */
+			JSONObject obj = new JSONObject(); /** highest json object */
+			stack.addFirst(obj);
+			write("Game", s);
+			game = (JSONObject) obj.get("Game");
+			f.write(game.toJSONString());
+			f.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-  public Storable read() {
-	// Initialise variables
-    JSONParser parser = new JSONParser();
-    JSONObject jsonObject = null;
-    Storable output = null;
-    
-    // Try reading and parsing the file
-    try {
-    	jsonObject = (JSONObject) parser.parse(new FileReader(file));
-    	stack.push(jsonObject);
-    } catch (Exception e) {
-    	e.printStackTrace();
-    }
-    
-    // Handle cache and object creation
-    /**
-    String curr_id = (String) jsonObject.get("id");
-    if (readcache.get(curr_id) == null) {
-    	int index_at = curr_id.indexOf("@");
-    	String clazz = curr_id.substring(0,index_at);
-    	output = factory.newInstance(clazz);
-    	readcache.put(curr_id, output);
-    } else {
-    	output = readcache.get(curr_id);
-    } */
-    output = fromJson(jsonObject);
-    stack.pop();
-    
-    // return the object
-    return output;
-  }
-  
-  @SuppressWarnings("unchecked")
-  private JSONObject toJson(Storable s) {
-	  JSONObject output = new JSONObject();
-	  // If not in writecache
-	  if (!writecache.containsKey(s)) {
-		  // s wasn't in cache, add it and assign new ID
-		  String new_id = s.getClass().getSimpleName()+"@"+String.valueOf(idGenerator++);
-		  output.put("id", new_id);
-		  writecache.put(s, new_id);
-		  stack.push(output);
-		  s.marshal(this);
-		  output = stack.pop();
-	  } else { // If in writecache
-		  output.put("id", writecache.get(s));
-		  
-	  }
-	  
+	}
 
-	  
-	  return output;
-  }
-  
-  /** Create object from Jsonobject*/
-  @SuppressWarnings("unchecked")
-  private <T extends Storable> T fromJson(JSONObject json) {
-	  String id = (String) json.get("id");
-	  Storable t = null;
-	  
-	  if (readcache.containsKey(id)) {
-		  // if only id
-		  t = readcache.get(id);
-		  if (json.keySet().size() != 1) {
-			  t.unmarshal(this);
-		  }
-	  } else {
-		  String clazz = id.substring(0, id.indexOf("@"));
-		  t = factory.newInstance(clazz);
-		  readcache.put(id, t);
-		  if (json.keySet().size() != 1) {
-			  t.unmarshal(this); 
-		  }
-		 
-	  }
-	  
-	  return (T) t;
-  }
-  
-  @SuppressWarnings("unchecked")
-  @Override
-  public void write(String key, Storable object) {
-	  if (object == null) {
-		  stack.getFirst().put(key, null);
-		  return;
-	  }
-	  if (writecache.containsKey(object)) {
-		  stack.getFirst().put(key, writecache.get(object));
-	  } else {
-		  stack.getFirst().put(key, toJson(object));
-	  }
+	public Storable read() {
+		/**
+		 * initialize variables
+		 */
+		JSONParser parser = new JSONParser();
+		Storable game = null;
 
-  }
+		/**
+		 * try to parse
+		 */
+		try (Reader r = new FileReader(file)) {
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T extends Storable> T read(String key) {
-	 /**
-	  Storable output = null;
-	  // put storable to be read on stack
-	  stack.push((JSONObject) stack.getFirst().get(key));
-	  
-	  // check readcache
-	  String curr_id = (String) stack.getFirst().get("id");
-	  if (readcache.get(curr_id) == null) {
-		  int index_at = curr_id.indexOf("@");
-		  String clazz = curr_id.substring(0,index_at);
-		  output = factory.newInstance(clazz);
-		  readcache.put(curr_id, output);
-	  } else {
-		  output = readcache.get(stack.getFirst().get("id"));
-	  }
-	stack.pop();
-    return (T) output;
-    */
-	  
-	  Storable output = null;
-	  
-	  //CHECK READCACHE STRING NOT JSON IF NOT NEW
-	  if (stack.getFirst().get(key) instanceof String) {
-		  return (T) readcache.get(key);
-	  }
-	  if (stack.getFirst().get(key) == null) return null;
-	  JSONObject json =(JSONObject) stack.getFirst().get(key);
-	  stack.push(json);
-	  output = fromJson(json);
-	  stack.pop();
-	  
-	  return (T) output;
-  }
-  
-//  private <T extends Storable> T fromJson(String key) {
-//	  return null;
-//  }
+			Object parsed = parser.parse(r);
+			JSONObject jsonObject = (JSONObject) parsed;
+			stack.push(jsonObject);
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public void write(String key, int object) {
-    stack.getFirst().put(key, object);
+			/**
+			 * get id
+			 */
+			String id = (String) jsonObject.get("id");
+			int index_at = id.indexOf("@");
+			String clazz = id.substring(0, index_at);
 
-  }
+			/**
+			 * load first object = game
+			 */
+			game = factory.newInstance(clazz);
+			stack.addFirst(jsonObject);
+			readcache.put(id, game);
+			/**
+			 * start unmarshalling
+			 */
+			game.unmarshal(this);
+			/**
+			 * remove when finsished
+			 */
+			stack.pop();
 
-  @Override
-  public int readInt(String key) {
-    return Integer.parseInt(stack.getFirst().get(key).toString());
-  }
+		} catch (FileNotFoundException fe) {
+			fe.printStackTrace();
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public void write(String key, double object) {
-    stack.getFirst().put(key, object);
-  }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return game;
+		// Handle cache and object creation
+		/**
+		 * String curr_id = (String) jsonObject.get("id"); if (readcache.get(curr_id) ==
+		 * null) { int index_at = curr_id.indexOf("@"); String clazz =
+		 * curr_id.substring(0,index_at); output = factory.newInstance(clazz);
+		 * readcache.put(curr_id, output); } else { output = readcache.get(curr_id); }
+		 */
 
-  @Override
-  public double readDouble(String key) {
-    return (double) stack.getFirst().get(key);
-  }
+		// return the object
+		// return output;
+	}
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public void write(String key, String object) {
-    stack.getFirst().put(key, object);
-  }
+	@Override
+	public void write(String key, Storable object) {
+		/**
+		 * if the storable is already in the writecache, get its id and put everything
+		 * into the outer json object
+		 */
+		if (writecache.keySet().contains(object)) {
+			JSONObject parent = stack.getFirst();
+			parent.put(object, writecache.get(object));
+			return;
+		} 
 
-  @Override
-  public String readString(String key) {
-    return (String) stack.getFirst().get(key);
-  }
+		/**
+		 * account for empty objects
+		 */
+		else if (object == null) {
+			JSONObject parent = stack.getFirst();
+			parent.put(key, null);
+			return;
+		}
+		
+		JSONObject child = new JSONObject();
+		String id = getObjectId(object);
+		child.put("id", id);
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public void write(String key, Collection<? extends Storable> coll) {
-	  JSONObject coll_json = new JSONObject();
-	  stack.push(coll_json);
-	  for (Storable s : coll) {
-		  JSONObject converted_storable = toJson(s);
-		  stack.getFirst().put(writecache.get(s), converted_storable);
-	  }
-	  coll_json = stack.pop();
-	  stack.getFirst().put(key, coll_json);
-  }
+		/**
+		 * insert into writecache and add to stack
+		 */
+		writecache.put(object, id);
+		stack.addFirst(child);
 
-  @Override
-  public void readAll(String key, Collection<? extends Storable> coll) {
-    JSONObject coll_json = (JSONObject) stack.getFirst().get(key);
-    // handle empty coll
-    if (coll_json == null) return;
-    // handle non-empty coll
-    for (Object id : coll_json.keySet()) {
-    	JSONObject coll_element_json = (JSONObject) coll_json.get(id);
-    	
-    	stack.push(coll_element_json);
-    	coll.add(fromJson(coll_element_json));
-    	stack.pop();
-    }
+		/**
+		 * initialize recursive marshalling
+		 */
+		object.marshal(this);
 
-  }
+		/**
+		 * in any case, put child object into the outer json object
+		 */
+		JSONObject temp = stack.pop();
+		JSONObject parent = stack.getFirst();
+		parent.put(key, temp);
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public void write(String key, Tile[][] coll) {
-	  JSONObject room_json = new JSONObject();
-	  stack.push(room_json);
-	  int i = 0;
-	  int j = 0;
-	  for (Tile[] tlist:coll) {
-	  //for (int x = 0; x < coll.length; x++) {
-	  //  Tile[] tlist = coll[x];
-		  JSONObject tlist_json = new JSONObject();
-		  
-		  stack.push(tlist_json);
-		  //for (Tile t:tlist) {
-		  for (int x = 0; x < tlist.length; x++) {
-			  Tile t = tlist[x];
-			  JSONObject tile_json = toJson(t);
-			  tile_json.put("index", x);
-			  stack.getFirst().put(writecache.get(t), tile_json);
-			  if (x > j) j = x;
-		  }
-		  tlist_json = stack.pop();
-		  stack.getFirst().put(i, tlist_json);
-		  i++;
-	  }
-	  room_json = stack.pop();
-	  room_json.put("array_length", i);
-	  room_json.put("array_width", j+1);
-	  stack.getFirst().put(key, room_json);
-  }
+	}
 
-  @Override
-  public Tile[][] readBoard(String key) {
-	  stack.push((JSONObject) stack.getFirst().get(key));
-//	  if (readcache.containsKey(stack.getFirst().get("id"))) {
-//	  }
-	  int length = Integer.parseInt(stack.getFirst().get("array_length").toString());
-	  int width = Integer.parseInt(stack.getFirst().get("array_width").toString());
-	  Tile[][] output = new Tile[length][width]; 
-	  Tile t = null;
-	  
-	  for (Object index : stack.getFirst().keySet()) {
-		  if (index.equals("array_length")) break;
-		  if (index.equals("array_width")) break;
-		  stack.push((JSONObject) stack.getFirst().get(index));
-		  Tile[] tlist = new Tile[width];
-		  for (Object tile_id : stack.getFirst().keySet()) {
-			  JSONObject tile_json = (JSONObject) stack.getFirst().get(tile_id);
-			  stack.push(tile_json);
-			  t = fromJson(tile_json);
-			  tlist[Integer.parseInt(stack.getFirst().get("index").toString())] = (Tile) t;
-			  stack.pop();
-		  }
-		  output[Integer.valueOf((String) index)] = tlist;
-		  stack.pop();
-	  }
-	  stack.pop();
-	  
-    return output;
-  }
+	/* help method to create the id */
+	private String getObjectId(Storable object) {
+		String clazz = factory.getClassName(object.getClass());
+		String increment = Integer.toString(idGenerator++);
+		return clazz + "@" + increment;
+	}
+
+	@Override
+	public <T extends Storable> T read(String key) {
+		JSONObject parent;
+		Object raw = stack.getFirst().get(key);
+		T obj; /** return object */
+
+		/**
+		 * check for nulls
+		 */
+		if (raw == null) {
+			return null;
+		}
+
+		/**
+		 * try to retrieve from readcache
+		 */
+		else if (readcache.keySet().contains(key)) {
+			return (T) readcache.get(key);
+		}
+
+		/**
+		 * encounter an existing id
+		 */
+		else if (raw instanceof String) {
+			return (T) readcache.get(raw);
+		}
+
+		/**
+		 * no other possibility left, so do the actual work
+		 */
+		else {
+			parent = (JSONObject) raw;
+			String existingId = (String) parent.get("id");
+
+			/**
+			 * retrieve id
+			 */
+			int index_at = existingId.indexOf("@");
+			String clazz = existingId.substring(0, index_at);
+
+			/**
+			 * create new object
+			 */
+			obj = (T) factory.newInstance(clazz);
+
+			/**
+			 * insert into readcache
+			 */
+			readcache.put(key, obj);
+
+			/**
+			 * put parent on stack
+			 */
+			stack.addFirst(parent);
+
+			/**
+			 * unmarshal lower level object
+			 */
+			obj.unmarshal(this);
+
+			/**
+			 * remove the read item from the stack
+			 */
+			stack.pop();
+
+			return obj;
+		}
+	}
+
+	@Override
+	public void write(String key, int object) {
+		stack.getFirst().put(key, object);
+	}
+
+	@Override
+	public int readInt(String key) {
+		return Integer.parseInt(stack.getFirst().get(key).toString());
+	}
+
+	@Override
+	public void write(String key, double object) {
+		stack.getFirst().put(key, object);
+	}
+
+	@Override
+	public double readDouble(String key) {
+		return (double) stack.getFirst().get(key);
+	}
+
+	@Override
+	public void write(String key, String object) {
+		stack.getFirst().put(key, object);
+	}
+
+	@Override
+	public String readString(String key) {
+		return (String) stack.getFirst().get(key);
+	}
+
+	@Override
+	public void write(String key, Collection<? extends Storable> coll) {
+		JSONArray array = new JSONArray(); /** array for contained json objects */
+
+		for (Storable s : coll) {
+			stack.addFirst(new JSONObject());
+
+			/**
+			 * initiate marshalling of the collection's objects; it will also be added to
+			 * writechache in the write method
+			 */
+			write("bla", s);
+
+			/**
+			 * return the new object (String if the object was referenced before or json
+			 * object)
+			 */
+			Object element = stack.pop().get("bla");
+			
+			/**
+			 * when done, return a String if there is such an object (i.e. there is an id)
+			 * else return the new json object
+			 */
+			if (element instanceof String) {
+				String existingId = (String) element;
+				array.add(existingId);
+			} else {
+				JSONObject json = (JSONObject) element;
+				array.add(json);
+			}
+		}
+	}
+
+	@Override
+	public void readAll(String key, Collection<? extends Storable> coll) {
+		Object raw = stack.getFirst().get(key);
+		Collection<JSONObject> temp = (Collection<JSONObject>) raw;
+		for (Object obj : temp) {
+			coll.add(fromJson(obj));
+		}
+	}
+
+	public <T extends Storable> T fromJson(Object obj) {
+		JSONObject child;
+
+		/**
+		 * empty collection
+		 */
+		if (obj == null) {
+			return null;
+		}
+
+		/**
+		 * handle existing ids
+		 */
+		else if (obj instanceof String) {
+			return (T) readcache.get(obj);
+		}
+
+		/**
+		 * if it's not null or a string, the collection element has to be a json object
+		 */
+		else {
+			JSONObject parent = new JSONObject();
+			child = (JSONObject) obj;
+			parent.put("bla", child);
+			stack.addFirst(parent);
+			T output = (T) read("bla");
+			stack.pop();
+			return output;
+		}
+
+	}
+
+	@Override
+	public void write(String key, Tile[][] coll) {
+		JSONObject parent = stack.getFirst(); /** room */
+		JSONArray jsonCols = new JSONArray(); /** cols */
+
+		/** loop over all cols */
+		for (Tile[] row : coll) {
+			JSONArray jsonRow = new JSONArray();
+
+			/** loop over all rows */
+			for (Tile tile : row) {
+				JSONObject jsonTile; /** tile to be written */
+
+				/** create object on stack that will be written */
+				stack.addFirst(new JSONObject());
+				write("bla", tile);
+
+				/** fetch tile after writing */
+				jsonTile = stack.pop();
+				jsonRow.add(jsonTile);
+			}
+			jsonCols.add(jsonRow);
+		}
+		parent.put(key, jsonCols);
+	}
+
+	@Override
+	public Tile[][] readBoard(String key) {
+		JSONObject parent = stack.getFirst();
+		JSONArray array = (JSONArray) parent.get(key); /** the board, needs to be cast */
+
+		/**
+		 * create a new default tilelist. praise the json arrays!
+		 */
+		int height = array.size();
+		int width = ((JSONArray) array.get(0)).size();
+		Tile[][] tiles = new Tile[height][width];
+
+		/**
+		 * do the heavy work
+		 */
+		for (int h = 0; h < height; h++) { /** rows */
+			JSONArray jsonRow = (JSONArray) array.get(h);
+
+			/**
+			 * single fields
+			 */
+			for (int w = 0; w < width; w++) {
+				Object obj = jsonRow.get(w);
+
+				/**
+				 * break if field is null (necessary?)
+				 */
+				if (obj == null) {
+					tiles[w][h] = null;
+					break;
+				}
+				/**
+				 * check for encountered fields, existing id found
+				 */
+				else if (obj instanceof String) {
+					Tile t = (Tile) readcache.get((String) obj);
+					tiles[h][w] = t;
+				}
+
+				/**
+				 * now, only a new json object is left; put it on the stack and then read it.
+				 */
+				else {
+					JSONObject temp = new JSONObject();
+					temp.put("bla", (JSONObject) obj);
+					stack.addFirst(temp);
+					tiles[h][w] = read("bla");
+					/**
+					 * remove again
+					 */
+					stack.pop();
+				}
+			}
+		}
+		return tiles;
+	}
 
 }
