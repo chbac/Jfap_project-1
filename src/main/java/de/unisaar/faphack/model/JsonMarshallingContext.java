@@ -22,7 +22,7 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   private Deque<JSONObject> stack;
 
-  private Map<String, Storable> readcache;
+  private Map<String, Storable> readcache, readcache2;
 
   private int idGenerator = 1;
 
@@ -31,6 +31,7 @@ public class JsonMarshallingContext implements MarshallingContext {
     factory = fact;
     writecache = new IdentityHashMap<Storable, String>();
     readcache = new HashMap<String, Storable>();
+    readcache2 = new HashMap<String, Storable>();
     stack = new ArrayDeque<JSONObject>();
   }
 
@@ -73,7 +74,6 @@ public class JsonMarshallingContext implements MarshallingContext {
     } */
     output = fromJson(jsonObject);
     stack.pop();
-    
     // return the object
     return output;
   }
@@ -104,20 +104,31 @@ public class JsonMarshallingContext implements MarshallingContext {
   @SuppressWarnings("unchecked")
   private <T extends Storable> T fromJson(JSONObject json) {
 	  String id = (String) json.get("id");
+	  if (id.equals("DoorTile@12")) System.out.println("DoorTile@12: "+stack.getFirst().get("hallway"));
+	  //if (id.equals("DoorTile@10")) System.out.println("DoorTile@10: "+((JSONObject) stack.getFirst().get("hallway")).get("id"));
 	  Storable t = null;
-	  
+	  System.out.print("X");
+	  if (id.equals("Hallway@11")) System.out.println(stack.getFirst());
 	  if (readcache.containsKey(id)) {
 		  // if only id
 		  t = readcache.get(id);
 		  if (json.keySet().size() != 1) {
-			  t.unmarshal(this);
+			  if (!(json.keySet().size() == 2 && json.containsKey("index"))) {
+				readcache2.put(id, t);
+				t.unmarshal(this);  
+			  }
 		  }
 	  } else {
+		  if (id.equals("DoorTile@12")) System.out.println("Define door12 here");
 		  String clazz = id.substring(0, id.indexOf("@"));
 		  t = factory.newInstance(clazz);
 		  readcache.put(id, t);
 		  if (json.keySet().size() != 1) {
-			  t.unmarshal(this); 
+			  if (!(json.keySet().size() == 2 && json.containsKey("index"))) {
+				    if (id.equals("DoorTile@12")) System.out.println("Define door12 here");
+					readcache2.put(id, t);
+				    t.unmarshal(this);  
+				  }
 		  }
 		 
 	  }
@@ -142,31 +153,11 @@ public class JsonMarshallingContext implements MarshallingContext {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends Storable> T read(String key) {
-	 /**
+  public <T extends Storable> T read(String key) { 
 	  Storable output = null;
-	  // put storable to be read on stack
-	  stack.push((JSONObject) stack.getFirst().get(key));
-	  
-	  // check readcache
-	  String curr_id = (String) stack.getFirst().get("id");
-	  if (readcache.get(curr_id) == null) {
-		  int index_at = curr_id.indexOf("@");
-		  String clazz = curr_id.substring(0,index_at);
-		  output = factory.newInstance(clazz);
-		  readcache.put(curr_id, output);
-	  } else {
-		  output = readcache.get(stack.getFirst().get("id"));
-	  }
-	stack.pop();
-    return (T) output;
-    */
-	  
-	  Storable output = null;
-	  
 	  //CHECK READCACHE STRING NOT JSON IF NOT NEW
 	  if (stack.getFirst().get(key) instanceof String) {
-		  return (T) readcache.get(key);
+		  return (T) readcache2.get(key);
 	  }
 	  if (stack.getFirst().get(key) == null) return null;
 	  JSONObject json =(JSONObject) stack.getFirst().get(key);
