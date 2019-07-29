@@ -1,6 +1,5 @@
 package de.unisaar.faphack.model;
 
-import de.unisaar.faphack.model.map.Room;
 import de.unisaar.faphack.model.map.Tile;
 import org.json.simple.JSONArray;
 
@@ -10,7 +9,6 @@ import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.BiConsumer;
 
 public class JsonMarshallingContext implements MarshallingContext {
 
@@ -104,11 +102,9 @@ public class JsonMarshallingContext implements MarshallingContext {
   @SuppressWarnings("unchecked")
   private <T extends Storable> T fromJson(JSONObject json) {
 	  String id = (String) json.get("id");
-	  if (id.equals("DoorTile@12")) System.out.println("DoorTile@12: "+stack.getFirst().get("hallway"));
-	  //if (id.equals("DoorTile@10")) System.out.println("DoorTile@10: "+((JSONObject) stack.getFirst().get("hallway")).get("id"));
+//	  if (id.equals("DoorTile@12")) System.out.println("DoorTile@12: "+stack.getFirst().get("hallway"));
+//	  if (id.equals("DoorTile@10")) System.out.println("DoorTile@10: "+((JSONObject) stack.getFirst().get("hallway")).get("id"));
 	  Storable t = null;
-	  System.out.print("X");
-	  if (id.equals("Hallway@11")) System.out.println(stack.getFirst());
 	  if (readcache.containsKey(id)) {
 		  // if only id
 		  t = readcache.get(id);
@@ -119,13 +115,13 @@ public class JsonMarshallingContext implements MarshallingContext {
 			  }
 		  }
 	  } else {
-		  if (id.equals("DoorTile@12")) System.out.println("Define door12 here");
+//		  if (id.equals("DoorTile@12")) System.out.println("Define door12 here");
 		  String clazz = id.substring(0, id.indexOf("@"));
 		  t = factory.newInstance(clazz);
 		  readcache.put(id, t);
 		  if (json.keySet().size() != 1) {
 			  if (!(json.keySet().size() == 2 && json.containsKey("index"))) {
-				    if (id.equals("DoorTile@12")) System.out.println("Define door12 here");
+//				    if (id.equals("DoorTile@12")) System.out.println("Define door12 here");
 					readcache2.put(id, t);
 				    t.unmarshal(this);  
 				  }
@@ -157,7 +153,7 @@ public class JsonMarshallingContext implements MarshallingContext {
 	  Storable output = null;
 	  //CHECK READCACHE STRING NOT JSON IF NOT NEW
 	  if (stack.getFirst().get(key) instanceof String) {
-		  return (T) readcache2.get(key);
+		  return (T) readcache.get(stack.getFirst().get(key));
 	  }
 	  if (stack.getFirst().get(key) == null) return null;
 	  JSONObject json =(JSONObject) stack.getFirst().get(key);
